@@ -34,4 +34,13 @@ test.describe("Champion Page", () => {
     await page.goto("/champion/Ezreal");
     await expect(page.locator("text=PRO MATCHES").first()).toBeVisible();
   });
+
+  test("should display region filter dropdown", async ({ page }) => {
+    await page.goto("/champion/Ezreal");
+    const regionSelect = page.locator("select[aria-label='Filter by region']");
+    await expect(regionSelect).toBeVisible();
+    await expect(regionSelect).toHaveValue("");
+    // Verify "All Regions" is the default option
+    await expect(regionSelect.locator("option").first()).toHaveText("All Regions");
+  });
 });

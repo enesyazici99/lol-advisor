@@ -6,7 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useAppStore } from "@/stores/appStore";
 import { championIconUrl } from "@/lib/riot/ddragon";
-import { ROLES, type Role } from "@/lib/riot/constants";
+import { ROLES, REGIONS, type Role, type Region } from "@/lib/riot/constants";
 import { CyberButton } from "@/components/ui/CyberButton";
 import { CyberCard } from "@/components/ui/CyberCard";
 import { BuildSummary } from "@/components/probuilds/BuildSummary";
@@ -20,6 +20,7 @@ interface ChampionPageClientProps {
 export function ChampionPageClient({ championKey, championName }: ChampionPageClientProps) {
   const version = useAppStore((s) => s.version);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
 
   return (
     <motion.div
@@ -68,25 +69,38 @@ export function ChampionPageClient({ championKey, championName }: ChampionPageCl
         />
       </div>
 
-      {/* Role tabs */}
-      <div className="flex gap-2 mb-4 flex-wrap">
-        <CyberButton
-          variant="tab"
-          active={selectedRole === null}
-          onClick={() => setSelectedRole(null)}
-        >
-          ALL
-        </CyberButton>
-        {ROLES.map((role) => (
+      {/* Filters row: Role tabs + Region dropdown */}
+      <div className="flex items-center gap-4 mb-4 flex-wrap">
+        <div className="flex gap-2 flex-wrap flex-1">
           <CyberButton
-            key={role}
             variant="tab"
-            active={selectedRole === role}
-            onClick={() => setSelectedRole(selectedRole === role ? null : role)}
+            active={selectedRole === null}
+            onClick={() => setSelectedRole(null)}
           >
-            {role}
+            ALL
           </CyberButton>
-        ))}
+          {ROLES.map((role) => (
+            <CyberButton
+              key={role}
+              variant="tab"
+              active={selectedRole === role}
+              onClick={() => setSelectedRole(selectedRole === role ? null : role)}
+            >
+              {role}
+            </CyberButton>
+          ))}
+        </div>
+        <select
+          value={selectedRegion || ""}
+          onChange={(e) => setSelectedRegion((e.target.value as Region) || null)}
+          className="h-9 px-3 text-sm bg-surface-secondary border border-border rounded-lg text-fg focus:outline-none focus:border-accent transition-colors cursor-pointer"
+          aria-label="Filter by region"
+        >
+          <option value="">All Regions</option>
+          {REGIONS.map((region) => (
+            <option key={region} value={region}>{region}</option>
+          ))}
+        </select>
       </div>
 
       {/* Pro Match List */}
@@ -96,7 +110,7 @@ export function ChampionPageClient({ championKey, championName }: ChampionPageCl
             PRO MATCHES
           </h3>
         </div>
-        <ProMatchList championKey={championKey} role={selectedRole} />
+        <ProMatchList championKey={championKey} role={selectedRole} region={selectedRegion} />
       </CyberCard>
     </motion.div>
   );

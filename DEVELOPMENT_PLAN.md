@@ -9,7 +9,7 @@
 | Faz | Baslik | Durum |
 |-----|--------|-------|
 | FAZ 0 | Altyapi + Temel Kurulum | TAMAMLANDI |
-| FAZ 1 | ProBuilds Explorer (Core MVP) | KISMEN TAMAMLANDI |
+| FAZ 1 | ProBuilds Explorer (Core MVP) | TAMAMLANDI (veri limitleri haric) |
 | FAZ 2 | Summoner Arama + Match History | BASLANMADI |
 | FAZ 3 | Matchup Build Advisor | BASLANMADI |
 | FAZ 4 | Canli Mac Entegrasyonu | BASLANMADI |
@@ -40,7 +40,7 @@
 
 ---
 
-## FAZ 1: ProBuilds Explorer — KISMEN TAMAMLANDI
+## FAZ 1: ProBuilds Explorer — TAMAMLANDI (veri limitleri haric)
 
 ### Backend / Scraper
 
@@ -52,12 +52,12 @@
 | 11d | KDA parser (concatenated ratio fix) | DONE | Matematiksel split yontemi |
 | 11e | Match detail scraping (item timeline, skill order per level) | EKSIK | probuildstats match detail sayfasi scrape edilmiyor |
 | 11f | CS, Gold, Damage, Duration scraping | EKSIK | Bu veriler scrape edilmiyor, DB'de null |
-| 11g | Role detection per match | EKSIK | Tum maclar role=null olarak kaydediliyor |
+| 11g | Role detection per match | DONE | DDragon tags + Smite detection ile inferRole() |
 | 11h | Rune primary tree parsing | EKSIK | rune_primary_tree hep null, sadece keystone var |
 | 11i | Rune secondary slots parsing | EKSIK | Sadece secondary tree ID var, slot detayi yok |
 | 11j | Rune shards parsing | EKSIK | Shard bilgisi yok |
-| 11k | External ID ile dedup | EKSIK | Her scrape'de duplicate match ekleniyor |
-| 12a | `/api/cron/scrape-probuilds` cron endpoint | DONE | Ama sadece 20 champion icin (guncellenmeli) |
+| 11k | External ID ile dedup | DONE | matchFingerprint() ile uygulama katmaninda dedup |
+| 12a | `/api/cron/scrape-probuilds` cron endpoint | DONE | 172 champion, batch=30 ile |
 | 12b | `/api/cron/scrape-meta` meta aggregation cron | DONE | Pro match'lerden aggregate hesapliyor |
 | 13 | `scripts/initial-scrape.ts` toplu scrape | DONE | 172 champion, 3440 mac |
 | 14 | `/api/builds/pro-matches` endpoint | DONE | Paginated, role/region filtreli |
@@ -79,12 +79,12 @@
 | 17g | ItemBuildDisplay | DONE | Sirali item ikonlari |
 | 17h | SkillOrderDisplay | DONE | Q>W>E gosterimi |
 | 17i | ProPlayerBadge | DONE | Isim (accent) + takim + bolge |
-| 17j | Region filtresi (dropdown) | EKSIK | API destekliyor ama UI'da dropdown yok |
+| 17j | Region filtresi (dropdown) | DONE | Champion sayfasinda select dropdown |
 | 17k | OTP toggle | EKSIK | Veri yok, filtre yok |
 | 18a | Mac detay — accordion (ExpandedMatchDetail) | DONE | Inline expand, ayri sayfa yok |
-| 18b | MatchStats (KDA, CS, Gold, Damage, Duration) | DONE | CS/Gold/Damage/Duration hep "N/A" (veri yok) |
+| 18b | MatchStats (KDA, CS, Gold, Damage, Duration) | DONE | Sadece mevcut verileri gosteriyor (null olanlar gizli) |
 | 18c | ItemTimeline bileseni | DONE | Bileşen hazir ama veri yok, veri yoksa gizleniyor |
-| 18d | SkillTimeline bileseni | DONE | Bileşen hazir ama veri yok, veri yoksa gizleniyor |
+| 18d | SkillTimeline bileseni | DONE | Meta skill_order fallback gosteriyor, veri yoksa gizleniyor |
 | 18e | Ayri mac detay sayfasi (`/match/[matchId]`) | EKSIK | Yok, accordion ile inline gosterim var |
 | 19 | Loading states, error states, empty states | DONE | |
 | 20 | Framer Motion animasyonlari | DONE | Page transitions, list animations |
@@ -94,30 +94,32 @@
 | Tur | Sayi | Durum |
 |-----|------|-------|
 | Vitest (unit + component) | 69 | DONE |
-| Playwright (E2E) | 16 | DONE |
-| Toplam | 85 | HEPSI GECIYOR |
+| Playwright (E2E) | 17 | DONE |
+| Toplam | 86 | HEPSI GECIYOR |
 
 ---
 
 ## FAZ 1 EKSIK ISLER — Oncelik Sirasi
 
-### Yuksek Oncelik
+### Tamamlanan Eksikler
+
+| # | Gorev | Durum |
+|---|-------|-------|
+| E1 | Cron job'u tum champion'lari kapsasin | DONE — Batch=30, 172 champion |
+| E2 | Duplicate match onleme | DONE — matchFingerprint() ile app-level dedup |
+| E3 | Role detection | DONE — inferRole() (DDragon tags + Smite) |
+| E4 | MatchStats cleanup | DONE — Null alanlar gizleniyor |
+| E5/E6 | Skill order from meta | DONE — Meta skill_order fallback |
+| E8 | Region filtresi UI | DONE — Select dropdown |
+
+### Hala Eksik (probuildstats veri limitleri)
 
 | # | Gorev | Aciklama |
 |---|-------|----------|
-| E1 | Cron job'u tum champion'lari kapsasin | `scrape-probuilds` cron sadece 20 champion icin calisiyor, 172'ye guncellenmeli |
-| E2 | Duplicate match onleme | Her scrape'de ayni maclar tekrar ekleniyor. `external_id` veya hash ile dedup gerekli |
-| E3 | Role detection | Scraper'da match bazinda rol tespiti (lane/position bilgisi) |
-| E4 | CS/Gold/Damage/Duration scraping | MatchStats'ta hep "N/A" gozukuyor, bu veriler probuildstats'tan cekilebilir |
-
-### Orta Oncelik
-
-| # | Gorev | Aciklama |
-|---|-------|----------|
-| E5 | Item Timeline verisi | Match detail sayfasindan item timeline scrape et (hangi item kacinci dk) |
-| E6 | Skill Order per match | Match bazinda skill siralama (Q,W,Q,E,...) scrape et |
+| E4b | CS/Gold/Damage/Duration | probuildstats bu verileri sunmuyor — alternatif kaynak gerekli |
+| E5b | Item Timeline per match | probuildstats match detail sayfasi yok — Riot API ile cekilebilir |
+| E6b | Skill Order per match | probuildstats match bazinda skill order yok — Riot API ile cekilebilir |
 | E7 | Rune tam detay | Primary tree, secondary slots, shards bilgileri |
-| E8 | Region filtresi UI | Champion sayfasinda region dropdown (KR, EU, NA, CN) |
 | E9 | Popular Spells meta | Meta scraper spell data'yi tam topluyor ama UI'da gosterilmiyor |
 
 ### Dusuk Oncelik
@@ -223,7 +225,7 @@ lol-advisor/
 │       │   └── meta/route.ts               # DONE
 │       ├── scraper/trigger/route.ts        # DONE
 │       └── cron/
-│           ├── scrape-probuilds/route.ts   # DONE (20 champ, 172'ye guncellenmeli)
+│           ├── scrape-probuilds/route.ts   # DONE (172 champ, batch=30)
 │           └── scrape-meta/route.ts        # DONE
 ├── components/
 │   ├── layout/ (Header, SearchBar, Footer) # DONE
@@ -259,7 +261,7 @@ lol-advisor/
 │   ├── seed-champions.ts                   # DONE
 │   └── initial-scrape.ts                   # DONE (172 champion)
 ├── supabase/migrations/001_initial.sql     # DONE (tum tablolar)
-├── __tests__/                              # 85 test, hepsi geciyor
+├── __tests__/                              # 86 test, hepsi geciyor
 ├── vercel.json                             # DONE
 ├── tailwind.config.ts                      # DONE
 ├── vitest.config.ts                        # DONE
@@ -280,23 +282,20 @@ lol-advisor/
 | precomputed_scores | 0 | FAZ 3'te doldurulacak |
 
 ### pro_matches tablosunda NULL olan alanlar
-- `role` — her maçta null (scraper rol tespiti yapmiyor)
-- `cs`, `gold`, `damage`, `duration_minutes` — scraper bu verileri cekmiyor
-- `skill_order` — match bazinda skill order yok
-- `item_timeline` — match bazinda item timeline yok
+- `role` — yeni scrape'lerde inferRole() ile dolduruluyor (eski kayitlar null olabilir)
+- `cs`, `gold`, `damage`, `duration_minutes` — probuildstats bu verileri sunmuyor
+- `skill_order` — match bazinda yok, meta skill_order fallback olarak gosteriliyor
+- `item_timeline` — match bazinda yok, probuildstats'ta bu detay yok
 - `rune_primary_tree` — sadece keystone var, tree ID yok
 
 ---
 
 ## SONRAKI ADIM ONERISI
 
-FAZ 1 eksiklerini tamamlamak en mantikli siralama:
+FAZ 1 temel islevleri tamamlandi. Siradaki secenekler:
 
-1. **E2 — Duplicate onleme** (kritik, her scrape'de veri sisiyor)
-2. **E1 — Cron'u 172 champion'a genislet**
-3. **E4 — CS/Gold/Damage/Duration scraping** (MatchStats'i anlamli kilmak icin)
-4. **E3 — Role detection** (rol filtresini calistirmak icin)
-5. **E8 — Region filtresi UI**
-6. **E5/E6 — Item Timeline + Skill Order** (match detail'i zenginlestirmek)
+1. **FAZ 2 — Summoner Arama + Match History** (Riot API kullanarak)
+2. **E4b/E5b/E6b — Detayli mac verileri** (Riot Match-V5 API ile CS, Gold, Timeline, Skill Order)
+3. **FAZ 3 — Matchup Build Advisor** (lolalytics scraper + puanlama motoru)
 
-Bunlar tamamlaninca FAZ 1 %100 bitecek, sonra FAZ 2'ye gecilir.
+Riot API entegrasyonu hem FAZ 2 hem detayli veri eksiklerini kapsar.

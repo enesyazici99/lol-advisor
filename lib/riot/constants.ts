@@ -85,3 +85,62 @@ export const ROLE_LABELS: Record<Role, string> = {
 
 export const REGIONS = ["KR", "EUW", "NA", "CN", "LCK", "LEC", "LCS", "LPL"] as const;
 export type Region = (typeof REGIONS)[number];
+
+/** Infer primary role from DDragon champion tags + spell (Smite = JGL) */
+export const TAG_TO_PRIMARY_ROLE: Record<string, Role> = {
+  Marksman: "ADC",
+  Support: "SUP",
+};
+
+/** Multi-role champions: first tag determines primary. Override specific champions here. */
+export const CHAMPION_ROLE_OVERRIDE: Record<string, Role> = {
+  // Junglers that have Fighter/Assassin tags but are primarily JGL
+  LeeSin: "JGL", Elise: "JGL", Nidalee: "JGL", Hecarim: "JGL",
+  Khazix: "JGL", RekSai: "JGL", Kayn: "JGL", Viego: "JGL",
+  Lillia: "JGL", Belveth: "JGL", Briar: "JGL", Ivern: "JGL",
+  Kindred: "JGL", Graves: "JGL", Nocturne: "JGL", Shyvana: "JGL",
+  Rammus: "JGL", Amumu: "JGL", Sejuani: "JGL", Zac: "JGL",
+  Nunu: "JGL", Skarner: "JGL", Volibear: "JGL", Udyr: "JGL",
+  MasterYi: "JGL", XinZhao: "JGL", JarvanIV: "JGL", Vi: "JGL",
+  Warwick: "JGL", Fiddlesticks: "JGL", Evelynn: "JGL",
+  Diana: "JGL", Ekko: "JGL",
+  // Top laners
+  Darius: "TOP", Garen: "TOP", Mordekaiser: "TOP", Sett: "TOP",
+  Renekton: "TOP", Fiora: "TOP", Camille: "TOP", Irelia: "TOP",
+  Jax: "TOP", Riven: "TOP", Aatrox: "TOP", Ornn: "TOP",
+  Sion: "TOP", Malphite: "TOP", Gnar: "TOP", Kennen: "TOP",
+  Gangplank: "TOP", Illaoi: "TOP", Kled: "TOP", Yorick: "TOP",
+  Nasus: "TOP", Tryndamere: "TOP", Urgot: "TOP", Rumble: "TOP",
+  Singed: "TOP", Olaf: "TOP", Poppy: "TOP", KSante: "TOP",
+  Ambessa: "TOP",
+  // Mids
+  Yasuo: "MID", Yone: "MID", Sylas: "MID", Akali: "MID",
+  Katarina: "MID", Talon: "MID", Zed: "MID", Qiyana: "MID",
+  Fizz: "MID", Kassadin: "MID", Naafiri: "MID",
+  // Supports that are tanks
+  Thresh: "SUP", Nautilus: "SUP", Leona: "SUP", Braum: "SUP",
+  Alistar: "SUP", TahmKench: "SUP", Rell: "SUP", Taric: "SUP",
+  Blitzcrank: "SUP", Maokai: "SUP",
+};
+
+export function inferRole(championKey: string, tags: string[], spell1?: number | null, spell2?: number | null): Role {
+  // Smite = jungler
+  if (spell1 === 11 || spell2 === 11) return "JGL";
+
+  // Explicit override
+  if (CHAMPION_ROLE_OVERRIDE[championKey]) return CHAMPION_ROLE_OVERRIDE[championKey];
+
+  // Tag-based
+  for (const tag of tags) {
+    if (TAG_TO_PRIMARY_ROLE[tag]) return TAG_TO_PRIMARY_ROLE[tag];
+  }
+
+  // Default by first tag
+  const firstTag = tags[0];
+  if (firstTag === "Fighter") return "TOP";
+  if (firstTag === "Tank") return "TOP";
+  if (firstTag === "Mage") return "MID";
+  if (firstTag === "Assassin") return "MID";
+
+  return "MID";
+}

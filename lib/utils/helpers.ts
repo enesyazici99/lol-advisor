@@ -51,3 +51,16 @@ export function parseTimeAgo(text: string): Date {
 export function slugify(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
+
+/** Generate a fingerprint string for match dedup */
+export function matchFingerprint(
+  championKey: string,
+  proPlayer: string,
+  kills: number,
+  deaths: number,
+  assists: number,
+  items: number[],
+  win: boolean
+): string {
+  return `${championKey}|${proPlayer}|${kills}/${deaths}/${assists}|${[...items].sort().join(",")}|${win}`;
+}

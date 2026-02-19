@@ -12,11 +12,12 @@ import { useAppStore } from "@/stores/appStore";
 interface ProMatchListProps {
   championKey: string;
   role?: string | null;
+  region?: string | null;
 }
 
-export function ProMatchList({ championKey, role }: ProMatchListProps) {
+export function ProMatchList({ championKey, role, region }: ProMatchListProps) {
   const [page, setPage] = useState(1);
-  const { matches, hasMore, isLoading } = useProMatches(championKey, role, null, page);
+  const { matches, hasMore, isLoading } = useProMatches(championKey, role, region, page);
   const expandedMatchId = useAppStore((s) => s.expandedMatchId);
 
   if (isLoading && matches.length === 0) return <LoadingSpinner />;

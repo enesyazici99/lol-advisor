@@ -3,12 +3,18 @@ dotenv.config({ path: ".env.local" });
 
 import { createClient } from "@supabase/supabase-js";
 import { scrapeChampion } from "../lib/scraper/probuildstats";
-import { SUMMONER_SPELLS } from "../lib/riot/constants";
+import { SUMMONER_SPELLS, inferRole } from "../lib/riot/constants";
+import { matchFingerprint } from "../lib/utils/helpers";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-async function getAllChampionIds(): Promise<string[]> {
+interface ChampionInfo {
+  id: string;
+  tags: string[];
+}
+
+async function getAllChampions(): Promise<Map<string, ChampionInfo>> {
   const versionsRes = await fetch("https://ddragon.leagueoflegends.com/api/versions.json");
   const versions: string[] = await versionsRes.json();
   const version = versions[0];
@@ -16,7 +22,11 @@ async function getAllChampionIds(): Promise<string[]> {
     `https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`
   );
   const champData = await champRes.json();
-  return Object.keys(champData.data); // ["Aatrox", "Ahri", ...]
+  const map = new Map<string, ChampionInfo>();
+  for (const [key, val] of Object.entries(champData.data as Record<string, any>)) {
+    map.set(key, { id: val.id, tags: val.tags || [] });
+  }
+  return map;
 }
 
 function parseTimeAgo(text: string): Date {
@@ -32,68 +42,114 @@ function parseTimeAgo(text: string): Date {
   return now;
 }
 
+interface MatchRow {
+  champion_key: string;
+  pro_player: string;
+  kills: number;
+  deaths: number;
+  assists: number;
+  items: number[] | null;
+  win: boolean;
+}
+
+async function getExistingFingerprints(
+  supabase: ReturnType<typeof createClient<Record<string, never>>>,
+  championKey: string
+): Promise<Set<string>> {
+  const { data } = await supabase
+    .from("pro_matches")
+    .select("champion_key, pro_player, kills, deaths, assists, items, win")
+    .eq("champion_key", championKey)
+    .order("match_date", { ascending: false })
+    .limit(100);
+
+  const fps = new Set<string>();
+  if (data) {
+    for (const m of data as unknown as MatchRow[]) {
+      fps.add(matchFingerprint(m.champion_key, m.pro_player, m.kills, m.deaths, m.assists, m.items || [], m.win));
+    }
+  }
+  return fps;
+}
+
 async function main() {
   console.log("=== LOL Advisor — Full Scrape ===\n");
 
-  // Get only specific champions if passed as args, otherwise ALL
   const args = process.argv.slice(2);
+  console.log("Fetching all champion data from DDragon...");
+  const champMap = await getAllChampions();
+
   let champions: string[];
   if (args.length > 0) {
     champions = args;
     console.log(`Scraping ${champions.length} specified champions.\n`);
   } else {
-    console.log("Fetching all champion IDs from DDragon...");
-    champions = await getAllChampionIds();
+    champions = [...champMap.keys()];
     console.log(`Found ${champions.length} champions.\n`);
   }
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-  let totalMatches = 0;
+  let totalNew = 0;
+  let totalSkipped = 0;
   let successCount = 0;
   let failCount = 0;
 
   for (const champion of champions) {
-    process.stdout.write(`[${champions.indexOf(champion) + 1}/${champions.length}] Scraping ${champion}...`);
+    const idx = champions.indexOf(champion) + 1;
+    process.stdout.write(`[${idx}/${champions.length}] Scraping ${champion}...`);
 
     try {
       const result = await scrapeChampion(champion);
 
-      // Insert matches
-      const matchInserts = result.matches.map((m) => {
-        let spell1Id: number | null = null;
-        let spell2Id: number | null = null;
-        for (const [id, spell] of Object.entries(SUMMONER_SPELLS)) {
-          if (spell.key === m.spell1Key) spell1Id = parseInt(id);
-          if (spell.key === m.spell2Key) spell2Id = parseInt(id);
-        }
+      // Get existing fingerprints for dedup
+      const existing = await getExistingFingerprints(supabase, champion);
 
-        return {
-          champion_key: champion,
-          pro_player: m.proPlayer,
-          team: m.team,
-          region: m.region,
-          role: m.role,
-          kills: m.kills,
-          deaths: m.deaths,
-          assists: m.assists,
-          win: m.win,
-          items: m.items,
-          rune_primary_keystone: m.runeKeystoneId,
-          rune_primary_tree: null as number | null,
-          rune_secondary_tree: m.runeSecondaryTreeId,
-          spell1: spell1Id,
-          spell2: spell2Id,
-          skill_order: null as string | null,
-          item_timeline: null as Record<string, number[]> | null,
-          vs_champion: m.vsChampion,
-          cs: null as number | null,
-          gold: null as number | null,
-          damage: null as number | null,
-          duration_minutes: null as number | null,
-          match_date: m.timeAgo ? parseTimeAgo(m.timeAgo).toISOString() : new Date().toISOString(),
-          source_url: `https://www.probuildstats.com/champion/${champion}`,
-        };
-      });
+      const matchInserts = result.matches
+        .map((m) => {
+          let spell1Id: number | null = null;
+          let spell2Id: number | null = null;
+          for (const [id, spell] of Object.entries(SUMMONER_SPELLS)) {
+            if (spell.key === m.spell1Key) spell1Id = parseInt(id);
+            if (spell.key === m.spell2Key) spell2Id = parseInt(id);
+          }
+
+          const champInfo = champMap.get(champion);
+          const role = inferRole(champion, champInfo?.tags || [], spell1Id, spell2Id);
+
+          return {
+            champion_key: champion,
+            pro_player: m.proPlayer,
+            team: m.team,
+            region: m.region,
+            role,
+            kills: m.kills,
+            deaths: m.deaths,
+            assists: m.assists,
+            win: m.win,
+            items: m.items,
+            rune_primary_keystone: m.runeKeystoneId,
+            rune_primary_tree: null as number | null,
+            rune_secondary_tree: m.runeSecondaryTreeId,
+            spell1: spell1Id,
+            spell2: spell2Id,
+            skill_order: null as string | null,
+            item_timeline: null as Record<string, number[]> | null,
+            vs_champion: m.vsChampion,
+            cs: null as number | null,
+            gold: null as number | null,
+            damage: null as number | null,
+            duration_minutes: null as number | null,
+            match_date: m.timeAgo ? parseTimeAgo(m.timeAgo).toISOString() : new Date().toISOString(),
+            source_url: `https://www.probuildstats.com/champion/${champion}`,
+          };
+        })
+        .filter((m) => {
+          const fp = matchFingerprint(m.champion_key, m.pro_player, m.kills, m.deaths, m.assists, m.items, m.win);
+          return !existing.has(fp);
+        });
+
+      const skipped = result.matches.length - matchInserts.length;
+      totalSkipped += skipped;
 
       if (matchInserts.length > 0) {
         const { error } = await supabase.from("pro_matches").insert(matchInserts);
@@ -127,21 +183,20 @@ async function main() {
         );
       }
 
-      totalMatches += matchInserts.length;
+      totalNew += matchInserts.length;
       successCount++;
-      console.log(` ✓ ${matchInserts.length} matches, WR: ${result.meta.winRate}%`);
+      console.log(` ✓ ${matchInserts.length} new, ${skipped} skipped, WR: ${result.meta.winRate}%`);
     } catch (err: any) {
       failCount++;
       console.log(` ✗ ${err.message || err}`);
     }
 
-    // Rate limit: 1 sec between requests
     await new Promise((r) => setTimeout(r, 1000));
   }
 
   console.log(`\n=== Scrape Complete ===`);
   console.log(`Champions: ${successCount} success, ${failCount} failed`);
-  console.log(`Total matches inserted: ${totalMatches}`);
+  console.log(`New matches: ${totalNew}, Duplicates skipped: ${totalSkipped}`);
 }
 
 main().catch(console.error);
