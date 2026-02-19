@@ -8,11 +8,13 @@ interface AppState {
   searchQuery: string;
   version: string;
   expandedMatchId: string | null;
+  summonerExpandedMatchId: string | null;
   theme: Theme;
   setSelectedRole: (role: Role | null) => void;
   setSearchQuery: (query: string) => void;
   setVersion: (version: string) => void;
   setExpandedMatchId: (id: string | null) => void;
+  setSummonerExpandedMatchId: (id: string | null) => void;
   toggleTheme: () => void;
   setTheme: (theme: Theme) => void;
 }
@@ -22,11 +24,13 @@ export const useAppStore = create<AppState>((set) => ({
   searchQuery: "",
   version: "",
   expandedMatchId: null,
+  summonerExpandedMatchId: null,
   theme: "dark",
   setSelectedRole: (role) => set({ selectedRole: role }),
   setSearchQuery: (query) => set({ searchQuery: query }),
   setVersion: (version) => set({ version }),
   setExpandedMatchId: (id) => set({ expandedMatchId: id }),
+  setSummonerExpandedMatchId: (id) => set({ summonerExpandedMatchId: id }),
   toggleTheme: () =>
     set((state) => {
       const next = state.theme === "dark" ? "light" : "dark";
