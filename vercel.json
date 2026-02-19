@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/scrape-probuilds",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/scrape-meta",
+      "schedule": "0 1 * * *"
+    }
+  ]
+}
