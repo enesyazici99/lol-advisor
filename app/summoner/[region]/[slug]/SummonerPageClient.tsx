@@ -23,7 +23,7 @@ export function SummonerPageClient({
   const { profile, isLoading, error } = useSummonerAccount(gameName, tagLine, region);
 
   return (
-    <div className="py-6 space-y-6">
+    <div className="py-4 sm:py-6 space-y-4 sm:space-y-6">
       {/* Back navigation */}
       <Link
         href="/"

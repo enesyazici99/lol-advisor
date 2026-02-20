@@ -16,8 +16,32 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LOL Advisor — Pro Builds Explorer",
-  description: "League of Legends pro build verileri ve champion tavsiyeleri",
+  title: {
+    default: "LOL Advisor — Pro Builds & Matchup Guide",
+    template: "%s — LOL Advisor",
+  },
+  description:
+    "League of Legends pro build verileri, counter pick tavsiyeleri ve matchup analizi. ProBuilds, meta build, live game destegi.",
+  keywords: [
+    "League of Legends",
+    "LoL",
+    "pro builds",
+    "counter pick",
+    "matchup",
+    "advisor",
+    "build guide",
+  ],
+  openGraph: {
+    title: "LOL Advisor — Pro Builds & Matchup Guide",
+    description:
+      "League of Legends pro build verileri, counter pick tavsiyeleri ve matchup analizi.",
+    type: "website",
+    locale: "tr_TR",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

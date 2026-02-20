@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useMetaBuild } from "@/hooks/useProBuilds";
 import { useAppStore } from "@/stores/appStore";
-import { itemIconUrl, championIconUrl } from "@/lib/riot/ddragon";
+import { itemIconUrl, championIconUrl, spellIconUrl } from "@/lib/riot/ddragon";
 import { KEYSTONES, RUNE_TREES, SUMMONER_SPELLS } from "@/lib/riot/constants";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { CyberCard } from "@/components/ui/CyberCard";
@@ -142,7 +142,7 @@ export function BuildSummary({ championKey, championName, role }: BuildSummaryPr
                     {s1 && version && (
                       <div className="w-10 h-10 overflow-hidden border border-border rounded-lg">
                         <Image
-                          src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${s1.key}.png`}
+                          src={spellIconUrl(version, s1.key)}
                           alt={s1.name}
                           width={40}
                           height={40}
@@ -152,7 +152,7 @@ export function BuildSummary({ championKey, championName, role }: BuildSummaryPr
                     {s2 && version && (
                       <div className="w-10 h-10 overflow-hidden border border-border rounded-lg">
                         <Image
-                          src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${s2.key}.png`}
+                          src={spellIconUrl(version, s2.key)}
                           alt={s2.name}
                           width={40}
                           height={40}

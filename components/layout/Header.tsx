@@ -9,27 +9,27 @@ export function Header() {
   const toggleTheme = useAppStore((s) => s.toggleTheme);
 
   return (
-    <header className="flex items-center justify-between py-5 mb-8 border-b border-border">
-      <Link href="/" className="text-2xl font-bold tracking-tight text-fg">
+    <header className="flex items-center justify-between py-4 sm:py-5 mb-6 sm:mb-8 border-b border-border">
+      <Link href="/" className="text-xl sm:text-2xl font-bold tracking-tight text-fg">
         LOL<span className="text-accent">.ADV</span>
       </Link>
 
-      <div className="flex items-center gap-3">
+      <nav className="flex items-center gap-2 sm:gap-3" aria-label="Main navigation">
         <Link
           href="/advisor"
-          className="text-sm font-medium text-fg-secondary hover:text-accent transition-colors px-3 py-1.5"
+          className="text-xs sm:text-sm font-medium text-fg-secondary hover:text-accent transition-colors px-2 sm:px-3 py-1.5"
         >
           Advisor
         </Link>
         <Link
           href="/live"
-          className="text-sm font-medium text-fg-secondary hover:text-accent transition-colors px-3 py-1.5"
+          className="text-xs sm:text-sm font-medium text-fg-secondary hover:text-accent transition-colors px-2 sm:px-3 py-1.5"
         >
           Live
         </Link>
 
         {version && (
-          <span className="font-mono text-xs text-fg-muted bg-surface-tertiary px-3 py-1.5 rounded-lg">
+          <span className="hidden sm:inline font-mono text-xs text-fg-muted bg-surface-tertiary px-3 py-1.5 rounded-lg">
             Patch {version}
           </span>
         )}
@@ -45,7 +45,7 @@ export function Header() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
           )}
         </button>
-      </div>
+      </nav>
     </header>
   );
 }

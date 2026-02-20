@@ -46,9 +46,11 @@ export function SummonerProfile({ profile, version }: SummonerProfileProps) {
     ? `https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${profile.profileIconId}.png`
     : "";
 
+  // Responsive: stack on tiny screens
+
   return (
-    <CyberCard className="p-6">
-      <div className="flex items-center gap-5">
+    <CyberCard className="p-4 sm:p-6">
+      <div className="flex items-center gap-3 sm:gap-5">
         {/* Profile icon */}
         <div className="relative flex-shrink-0">
           {iconUrl && (

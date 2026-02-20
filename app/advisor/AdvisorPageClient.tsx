@@ -82,13 +82,13 @@ export function AdvisorPageClient({ champions, version }: AdvisorPageClientProps
   };
 
   return (
-    <div className="flex flex-col gap-8 pb-8">
+    <div className="flex flex-col gap-6 sm:gap-8 pb-6 sm:pb-8">
       {/* Page Title */}
       <div>
-        <h1 className="text-3xl font-bold text-fg">
+        <h1 className="text-2xl sm:text-3xl font-bold text-fg">
           Matchup <span className="text-accent">Advisor</span>
         </h1>
-        <p className="text-fg-muted text-sm mt-1">
+        <p className="text-fg-muted text-xs sm:text-sm mt-1">
           Select your role and lane opponent to get counter picks and build recommendations
         </p>
         {profile && (

@@ -38,9 +38,9 @@ export function ChampionPageClient({ championKey, championName }: ChampionPageCl
       </Link>
 
       {/* Champion header */}
-      <div className="flex items-center gap-4 mb-8">
+      <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
         {version && (
-          <div className="w-16 h-16 border-2 border-accent rounded-xl overflow-hidden flex-shrink-0 shadow-sm">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 border-2 border-accent rounded-xl overflow-hidden flex-shrink-0 shadow-sm">
             <Image
               src={championIconUrl(version, championKey)}
               alt={championName}
@@ -51,17 +51,17 @@ export function ChampionPageClient({ championKey, championName }: ChampionPageCl
           </div>
         )}
         <div>
-          <h1 className="text-3xl font-bold tracking-tight uppercase text-fg">
+          <h1 className="text-xl sm:text-3xl font-bold tracking-tight uppercase text-fg">
             {championName}
           </h1>
-          <p className="text-sm text-fg-muted mt-1">
+          <p className="text-xs sm:text-sm text-fg-muted mt-0.5 sm:mt-1">
             Pro Builds &middot; Patch {version || "..."}
           </p>
         </div>
       </div>
 
       {/* Build Summary */}
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <BuildSummary
           championKey={championKey}
           championName={championName}

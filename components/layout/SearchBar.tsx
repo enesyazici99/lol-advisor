@@ -28,13 +28,14 @@ export function SearchBar() {
   };
 
   return (
-    <div className="mb-8">
+    <div className="mb-6 sm:mb-8">
       <div className="flex gap-2">
         {isSummonerSearch && (
           <select
             value={selectedRegion}
             onChange={(e) => setSelectedRegion(e.target.value)}
-            className="px-3 py-3.5 bg-surface-secondary border border-border rounded-xl text-sm text-fg outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all"
+            className="px-3 py-3 sm:py-3.5 bg-surface-secondary border border-border rounded-xl text-sm text-fg outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all"
+            aria-label="Select region"
           >
             {SEARCH_REGIONS.map((r) => (
               <option key={r.value} value={r.value}>
@@ -49,7 +50,8 @@ export function SearchBar() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="flex-1 px-5 py-3.5 bg-surface-secondary border border-border rounded-xl text-base text-fg outline-none placeholder:text-fg-muted focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all"
+          aria-label="Search champions or summoners"
+          className="flex-1 px-4 sm:px-5 py-3 sm:py-3.5 bg-surface-secondary border border-border rounded-xl text-sm sm:text-base text-fg outline-none placeholder:text-fg-muted focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all"
         />
       </div>
       {isSummonerSearch && (

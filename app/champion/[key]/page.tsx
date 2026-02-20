@@ -31,7 +31,7 @@ export default async function ChampionPage({ params }: ChampionPageProps) {
   }
 
   return (
-    <div className="max-w-[1200px] mx-auto px-6">
+    <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
       <HomeClient version={version} />
       <Header />
       <ChampionPageClient championKey={key} championName={championName} />

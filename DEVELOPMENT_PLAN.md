@@ -1,6 +1,6 @@
 # LOL Advisor — Development Plan
 
-> Son guncelleme: 2026-02-20 (FAZ 4 tamamlandi)
+> Son guncelleme: 2026-02-20 (FAZ 5 tamamlandi)
 
 ---
 
@@ -13,7 +13,7 @@
 | FAZ 2 | Summoner Arama + Match History | TAMAMLANDI |
 | FAZ 3 | Matchup Build Advisor | TAMAMLANDI |
 | FAZ 4 | Canli Mac Entegrasyonu | TAMAMLANDI |
-| FAZ 5 | Polish + Production | BASLANMADI |
+| FAZ 5 | Polish + Production | TAMAMLANDI |
 | FAZ 6 | Desktop Companion | BASLANMADI |
 
 ---
@@ -227,15 +227,54 @@
 
 ---
 
-## FAZ 5: Polish + Production — BASLANMADI
+## FAZ 5: Polish + Production — TAMAMLANDI
+
+### Mobile Responsive
+
+| # | Gorev | Durum | Notlar |
+|---|-------|-------|--------|
+| 60a | ProMatchRow mobile | DONE | Responsive hiding (time, vs, runes, spells), smaller widths, div→button |
+| 60b | MatchHistoryRow mobile | DONE | Responsive hiding (time, runes, spells), div→button, aria-labels |
+| 60c | ChampionGrid mobile | DONE | grid-cols-4 (mobile) → grid-cols-10 (desktop) |
+| 60d | Header mobile | DONE | Responsive font, gap, hidden patch badge on mobile, nav semantics |
+| 60e | SearchBar mobile | DONE | Responsive padding/font, aria-label eklendi |
+| 60f | ChampionPageClient mobile | DONE | Responsive icon size, font size, spacing |
+| 60g | SummonerPageClient mobile | DONE | Responsive spacing |
+| 60h | SummonerProfile mobile | DONE | Responsive padding, gap |
+| 60i | LivePageClient mobile | DONE | Responsive title, spacing, input aria-labels |
+| 60j | AdvisorPageClient mobile | DONE | Responsive title, spacing |
+| 60k | Footer mobile | DONE | Responsive margin, padding, font |
+| 60l | Tum sayfalar px-4 sm:px-6 | DONE | page.tsx, champion, summoner, advisor, live |
+
+### SEO
+
+| # | Gorev | Durum | Notlar |
+|---|-------|-------|--------|
+| 61a | Enhanced metadata (layout.tsx) | DONE | title template, keywords, openGraph, robots |
+| 61b | robots.ts | DONE | Allow /, disallow /api/ |
+| 61c | sitemap.ts | DONE | Tum sayfalar + 172 champion sayfasi |
+
+### Accessibility
+
+| # | Gorev | Durum | Notlar |
+|---|-------|-------|--------|
+| 62a | Clickable div → button | DONE | ProMatchRow, MatchHistoryRow |
+| 62b | aria-label tum input/select | DONE | SearchBar, LivePageClient, Header nav |
+| 62c | aria-expanded expand rows | DONE | ProMatchRow, MatchHistoryRow |
+| 62d | nav semantic element | DONE | Header nav aria-label |
+
+### Performance
+
+| # | Gorev | Durum | Notlar |
+|---|-------|-------|--------|
+| 63a | spellIconUrl helper kullanimi | DONE | BuildSummary inline URL → spellIconUrl() |
+| 63b | Vercel cron job konfigurasyonu | DONE | vercel.json (4 cron job) |
+
+### Diger
 
 | # | Gorev | Durum |
 |---|-------|-------|
-| 60 | Responsive design (mobile) | KISMEN (grid responsive ama detaylar degil) |
-| 61 | SEO (champion sayfalari icin SSG/ISR) | EKSIK |
-| 62 | Vercel cron job konfigurasyonu | DONE (vercel.json hazir) |
-| 63 | Production Riot API key basvurusu | EKSIK |
-| 64 | Performance optimizasyonu | EKSIK |
+| 64 | Production Riot API key basvurusu | EKSIK (manual islem) |
 
 ---
 
@@ -254,11 +293,13 @@
 ```
 lol-advisor/
 ├── app/
-│   ├── layout.tsx                          # DONE
+│   ├── layout.tsx                          # DONE (FAZ 5 SEO metadata)
 │   ├── page.tsx                            # DONE
 │   ├── globals.css                         # DONE
 │   ├── providers.tsx                       # DONE (theme init)
 │   ├── HomeClient.tsx                      # DONE
+│   ├── robots.ts                           # DONE (FAZ 5)
+│   ├── sitemap.ts                          # DONE (FAZ 5)
 │   ├── champion/[key]/
 │   │   ├── page.tsx                        # DONE
 │   │   └── ChampionPageClient.tsx          # DONE
@@ -372,4 +413,4 @@ lol-advisor/
 
 ## SONRAKI ADIM
 
-**FAZ 5 — Polish + Production:** Responsive mobile design, SEO optimizasyonu (SSG/ISR), production Riot API key basvurusu, performance optimizasyonu.
+**FAZ 6 — Desktop Companion:** Electron/Tauri desktop app, LCU API entegrasyonu, WebSocket iletisimi.

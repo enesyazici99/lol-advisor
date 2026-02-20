@@ -50,7 +50,7 @@ export function ChampionGrid({ champions, version }: ChampionGridProps) {
 
   return (
     <motion.div
-      className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2.5"
+      className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 sm:gap-2.5"
       initial="hidden"
       animate="visible"
       variants={{

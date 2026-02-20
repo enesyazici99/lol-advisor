@@ -81,13 +81,13 @@ export function LivePageClient({ champions, version }: LivePageClientProps) {
   };
 
   return (
-    <div className="flex flex-col gap-8 pb-8">
+    <div className="flex flex-col gap-6 sm:gap-8 pb-6 sm:pb-8">
       {/* Page Title */}
       <div>
-        <h1 className="text-3xl font-bold text-fg">
+        <h1 className="text-2xl sm:text-3xl font-bold text-fg">
           Live <span className="text-accent">Game</span>
         </h1>
-        <p className="text-fg-muted text-sm mt-1">
+        <p className="text-fg-muted text-xs sm:text-sm mt-1">
           Track active games or manually input team compositions for analysis
         </p>
       </div>
@@ -113,13 +113,14 @@ export function LivePageClient({ champions, version }: LivePageClientProps) {
       {mode === "live" ? (
         <>
           {/* Summoner Search */}
-          <CyberCard className="p-5">
+          <CyberCard className="p-4 sm:p-5">
             <div className="flex flex-col sm:flex-row gap-3">
               <input
                 type="text"
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
                 placeholder="Game Name"
+                aria-label="Game name"
                 className="flex-1 px-3 py-2 rounded-lg bg-surface-tertiary border border-border text-fg text-sm focus:outline-none focus:border-accent transition-colors"
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
@@ -128,12 +129,14 @@ export function LivePageClient({ champions, version }: LivePageClientProps) {
                 value={searchTag}
                 onChange={(e) => setSearchTag(e.target.value)}
                 placeholder="Tag"
-                className="w-24 px-3 py-2 rounded-lg bg-surface-tertiary border border-border text-fg text-sm focus:outline-none focus:border-accent transition-colors"
+                aria-label="Tag line"
+                className="w-full sm:w-24 px-3 py-2 rounded-lg bg-surface-tertiary border border-border text-fg text-sm focus:outline-none focus:border-accent transition-colors"
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
               <select
                 value={searchRegion}
                 onChange={(e) => setSearchRegion(e.target.value)}
+                aria-label="Select region"
                 className="px-3 py-2 rounded-lg bg-surface-tertiary border border-border text-fg text-sm focus:outline-none focus:border-accent"
               >
                 {SEARCH_REGIONS.map((r) => (
