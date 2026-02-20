@@ -6,6 +6,9 @@ import type {
   MatchDetail,
   FullParticipant,
   ParticipantSummary,
+  SpectatorCurrentGame,
+  LiveGameData,
+  LiveParticipantData,
 } from "./types";
 
 // ─── Position Normalization ───────────────────────────────────
@@ -211,5 +214,47 @@ export function transformMatchDetail(
     participants,
     itemTimeline: timelineData.itemTimeline,
     skillOrder: timelineData.skillOrder,
+  };
+}
+
+// ─── Transform Spectator Data ────────────────────────────────
+
+export function transformSpectatorGame(
+  game: SpectatorCurrentGame,
+  championMap: Record<string, string>
+): LiveGameData {
+  const transformParticipant = (p: SpectatorCurrentGame["participants"][0]): LiveParticipantData => {
+    const championName = championMap[String(p.championId)] || `Champion ${p.championId}`;
+    return {
+      puuid: p.puuid || null,
+      summonerName: p.riotId || `Player`,
+      championId: p.championId,
+      championName,
+      spell1Id: p.spell1Id,
+      spell2Id: p.spell2Id,
+      keystoneId: p.perks?.perkIds?.[0] ?? null,
+      secondaryTreeId: p.perks?.perkSubStyle ?? null,
+      teamId: p.teamId,
+      isBot: p.bot,
+    };
+  };
+
+  const blueParticipants = game.participants
+    .filter((p) => p.teamId === 100)
+    .map(transformParticipant);
+
+  const redParticipants = game.participants
+    .filter((p) => p.teamId === 200)
+    .map(transformParticipant);
+
+  return {
+    gameId: game.gameId,
+    gameMode: game.gameMode,
+    gameLength: game.gameLength,
+    gameStartTime: game.gameStartTime,
+    mapId: game.mapId,
+    blueTeam: { teamId: 100, participants: blueParticipants },
+    redTeam: { teamId: 200, participants: redParticipants },
+    bannedChampions: game.bannedChampions,
   };
 }

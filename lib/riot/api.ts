@@ -6,6 +6,7 @@ import type {
   RiotLeagueEntry,
   RiotMatchResponse,
   RiotTimelineResponse,
+  SpectatorCurrentGame,
 } from "./types";
 
 const RIOT_API_KEY = process.env.RIOT_API_KEY || "";
@@ -100,4 +101,33 @@ export async function getMatchTimeline(
   return riotFetch<RiotTimelineResponse>(
     `${regionUrl(platform)}/lol/match/v5/matches/${matchId}/timeline`
   );
+}
+
+/** Spectator V5 — get active game by PUUID (platform routing)
+ *  NOTE: This API may be deactivated by Riot Games.
+ *  Returns null if player is not in game (404) or API is unavailable.
+ */
+export async function getActiveGame(
+  puuid: string,
+  platform?: string
+): Promise<SpectatorCurrentGame | null> {
+  await rateLimiter.acquire();
+
+  const res = await fetch(
+    `${platformUrl(platform)}/lol/spectator/v5/active-games/by-summoner/${puuid}`,
+    {
+      headers: { "X-Riot-Token": RIOT_API_KEY },
+    }
+  );
+
+  // 404 = not in game (normal), 403 = API deactivated
+  if (res.status === 404 || res.status === 403) {
+    return null;
+  }
+
+  if (!res.ok) {
+    throw new Error(`Spectator API error: ${res.status} ${res.statusText}`);
+  }
+
+  return res.json();
 }

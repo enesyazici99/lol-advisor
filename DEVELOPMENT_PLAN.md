@@ -1,6 +1,6 @@
 # LOL Advisor — Development Plan
 
-> Son guncelleme: 2026-02-20
+> Son guncelleme: 2026-02-20 (FAZ 4 tamamlandi)
 
 ---
 
@@ -12,7 +12,7 @@
 | FAZ 1 | ProBuilds Explorer (Core MVP) | TAMAMLANDI (veri limitleri haric) |
 | FAZ 2 | Summoner Arama + Match History | TAMAMLANDI |
 | FAZ 3 | Matchup Build Advisor | TAMAMLANDI |
-| FAZ 4 | Canli Mac Entegrasyonu | BASLANMADI |
+| FAZ 4 | Canli Mac Entegrasyonu | TAMAMLANDI |
 | FAZ 5 | Polish + Production | BASLANMADI |
 | FAZ 6 | Desktop Companion | BASLANMADI |
 
@@ -198,18 +198,32 @@
 
 ---
 
-## FAZ 4: Canli Mac Entegrasyonu — BASLANMADI
+## FAZ 4: Canli Mac Entegrasyonu — TAMAMLANDI
 
-| # | Gorev | Durum |
-|---|-------|-------|
-| 52 | Spectator-V5 API entegrasyonu (`lib/riot/api.ts`'e ekle) | EKSIK |
-| 53 | `/api/riot/spectator/route.ts` endpoint | EKSIK |
-| 54 | `hooks/useLiveGame.ts` (polling hook) | EKSIK |
-| 55 | `/live/page.tsx` LiveGame sayfasi | EKSIK |
-| 56 | LiveGameDashboard bileseni | EKSIK |
-| 57 | Otomatik champion detect + advisor tetikleme | EKSIK |
-| 58 | 30 saniye polling | EKSIK |
-| 59 | Spectator calismazsa fallback | EKSIK |
+**Not:** Riot Games Spectator V5 API'yi deaktive etti (anonimlik ozellikleri). Sistem graceful fallback ile calisiyor — Spectator varsa kullanir, yoksa manuel takim girisi modu devreye girer.
+
+### Backend
+
+| # | Gorev | Durum | Notlar |
+|---|-------|-------|--------|
+| 52 | Spectator-V5 API fonksiyonu | DONE | getActiveGame() — 404/403 graceful handling |
+| 53 | Spectator types | DONE | SpectatorCurrentGame, LiveGameData, LiveParticipantData |
+| 54 | transformSpectatorGame() | DONE | Champion ID -> name mapping, team split |
+| 55 | `/api/riot/spectator/route.ts` | DONE | GET ?puuid&region, 15s cache |
+
+### Frontend
+
+| # | Gorev | Durum | Notlar |
+|---|-------|-------|--------|
+| 56 | `hooks/useLiveGame.ts` | DONE | 30s polling, auto-refresh |
+| 57 | `/live/page.tsx` + `LivePageClient.tsx` | DONE | Suspense, URL params destegiyle |
+| 58 | `components/live/TeamCard.tsx` | DONE | Blue/Red team, champion ikonlari, speller |
+| 59 | `components/live/LiveGameDashboard.tsx` | DONE | Takimlar + lane matchup build onerisi |
+| 60 | `components/live/ManualTeamInput.tsx` | DONE | 5 rol icin champion secimi, counter/build onerisi |
+| 61 | Live/Manual mode toggle | DONE | Tab switch |
+| 62 | Header "Live" nav link | DONE | |
+| 63 | Summoner arama (Live mode) | DONE | Name#Tag + region |
+| 64 | "Not in game" state + auto-retry | DONE | 30s polling, "Check Again" butonu |
 
 ---
 
@@ -254,6 +268,9 @@ lol-advisor/
 │   ├── advisor/
 │   │   ├── page.tsx                        # DONE (FAZ 3)
 │   │   └── AdvisorPageClient.tsx           # DONE (FAZ 3)
+│   ├── live/
+│   │   ├── page.tsx                        # DONE (FAZ 4)
+│   │   └── LivePageClient.tsx              # DONE (FAZ 4)
 │   └── api/
 │       ├── ddragon/version/route.ts        # DONE
 │       ├── builds/
@@ -264,7 +281,8 @@ lol-advisor/
 │       ├── riot/
 │       │   ├── account/route.ts            # DONE (FAZ 2)
 │       │   ├── matches/route.ts            # DONE (FAZ 2)
-│       │   └── match/[matchId]/route.ts    # DONE (FAZ 2)
+│       │   ├── match/[matchId]/route.ts    # DONE (FAZ 2)
+│       │   └── spectator/route.ts          # DONE (FAZ 4)
 │       ├── scraper/trigger/route.ts        # DONE
 │       └── cron/
 │           ├── scrape-probuilds/route.ts   # DONE
@@ -297,12 +315,17 @@ lol-advisor/
 │   │   ├── ChampionSelect.tsx
 │   │   ├── CounterList.tsx
 │   │   └── MatchupBuild.tsx
+│   ├── live/                               # DONE (FAZ 4)
+│   │   ├── TeamCard.tsx
+│   │   ├── LiveGameDashboard.tsx
+│   │   └── ManualTeamInput.tsx
 │   └── ui/ (CyberCard, CyberButton, etc.) # DONE
 ├── hooks/
 │   ├── useDataDragon.ts                    # DONE
 │   ├── useProBuilds.ts                     # DONE
 │   ├── useSummoner.ts                      # DONE (FAZ 2)
-│   └── useAdvisor.ts                       # DONE (FAZ 3)
+│   ├── useAdvisor.ts                       # DONE (FAZ 3)
+│   └── useLiveGame.ts                      # DONE (FAZ 4)
 ├── stores/appStore.ts                      # DONE (FAZ 3 state eklendi)
 ├── lib/
 │   ├── supabase/ (client, server, types)   # DONE (FAZ 3 tipler eklendi)
@@ -325,7 +348,7 @@ lol-advisor/
 │   ├── seed-champions.ts                   # DONE
 │   └── initial-scrape.ts                   # DONE (172 champion)
 ├── supabase/migrations/001_initial.sql     # DONE (tum tablolar)
-├── __tests__/                              # 109 unit/component + 17 e2e = 126 test
+├── __tests__/                              # 109 unit/component + 17 e2e
 ├── vercel.json                             # DONE (4 cron job)
 ├── tailwind.config.ts                      # DONE
 ├── vitest.config.ts                        # DONE
@@ -349,4 +372,4 @@ lol-advisor/
 
 ## SONRAKI ADIM
 
-**FAZ 4 — Canli Mac Entegrasyonu:** Spectator-V5 API ile oyuncunun aktif macini tespit edip, otomatik olarak rakip champion'lari algilayip counter pick + build onerisi sunma. 30 saniye polling ile canli guncelleme.
+**FAZ 5 — Polish + Production:** Responsive mobile design, SEO optimizasyonu (SSG/ISR), production Riot API key basvurusu, performance optimizasyonu.

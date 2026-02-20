@@ -21,6 +21,12 @@ export function Header() {
         >
           Advisor
         </Link>
+        <Link
+          href="/live"
+          className="text-sm font-medium text-fg-secondary hover:text-accent transition-colors px-3 py-1.5"
+        >
+          Live
+        </Link>
 
         {version && (
           <span className="font-mono text-xs text-fg-muted bg-surface-tertiary px-3 py-1.5 rounded-lg">

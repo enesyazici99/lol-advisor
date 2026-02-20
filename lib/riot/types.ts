@@ -187,6 +187,82 @@ export interface RiotTimelineResponse {
   };
 }
 
+// ─── Spectator V5 Types ──────────────────────────────────────
+
+/** Spectator V5 banned champion */
+export interface SpectatorBannedChampion {
+  pickTurn: number;
+  championId: number;
+  teamId: number;
+}
+
+/** Spectator V5 participant perks */
+export interface SpectatorPerks {
+  perkIds: number[];
+  perkStyle: number;
+  perkSubStyle: number;
+}
+
+/** Spectator V5 participant */
+export interface SpectatorParticipant {
+  championId: number;
+  perks?: SpectatorPerks;
+  profileIconId: number;
+  bot: boolean;
+  teamId: number;
+  puuid?: string | null;
+  summonerId: string;
+  spell1Id: number;
+  spell2Id: number;
+  riotId?: string;
+  gameCustomizationObjects?: Array<{ category: string; content: string }>;
+}
+
+/** Spectator V5 current game response */
+export interface SpectatorCurrentGame {
+  gameId: number;
+  gameType: string;
+  gameStartTime: number;
+  mapId: number;
+  gameLength: number;
+  platformId: string;
+  gameMode: string;
+  gameQueueConfigId?: number;
+  bannedChampions: SpectatorBannedChampion[];
+  observers: { encryptionKey: string };
+  participants: SpectatorParticipant[];
+}
+
+/** Transformed live game data for display */
+export interface LiveGameData {
+  gameId: number;
+  gameMode: string;
+  gameLength: number;
+  gameStartTime: number;
+  mapId: number;
+  blueTeam: LiveTeamData;
+  redTeam: LiveTeamData;
+  bannedChampions: SpectatorBannedChampion[];
+}
+
+export interface LiveTeamData {
+  teamId: number;
+  participants: LiveParticipantData[];
+}
+
+export interface LiveParticipantData {
+  puuid: string | null;
+  summonerName: string;
+  championId: number;
+  championName: string;
+  spell1Id: number;
+  spell2Id: number;
+  keystoneId: number | null;
+  secondaryTreeId: number | null;
+  teamId: number;
+  isBot: boolean;
+}
+
 // ─── Display / Transformed Types ──────────────────────────────
 
 /** Summoner profile for display */
