@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CyberCard } from "@/components/ui/CyberCard";
 import { CyberButton } from "@/components/ui/CyberButton";
 import { ChampionSelect } from "@/components/advisor/ChampionSelect";
@@ -14,19 +14,37 @@ import type { Role } from "@/lib/riot/constants";
 interface ManualTeamInputProps {
   champions: Record<string, DDragonChampion>;
   version: string;
+  initialMyChampion?: string | null;
+  initialMyRole?: Role | null;
+  initialEnemyChampions?: (string | null)[];
 }
 
-export function ManualTeamInput({ champions, version }: ManualTeamInputProps) {
-  const [myChampion, setMyChampion] = useState<string | null>(null);
-  const [myRole, setMyRole] = useState<Role | null>(null);
-  const [enemyChampions, setEnemyChampions] = useState<(string | null)[]>([
-    null,
-    null,
-    null,
-    null,
-    null,
-  ]);
+export function ManualTeamInput({
+  champions,
+  version,
+  initialMyChampion,
+  initialMyRole,
+  initialEnemyChampions,
+}: ManualTeamInputProps) {
+  const [myChampion, setMyChampion] = useState<string | null>(initialMyChampion ?? null);
+  const [myRole, setMyRole] = useState<Role | null>(initialMyRole ?? null);
+  const [enemyChampions, setEnemyChampions] = useState<(string | null)[]>(
+    initialEnemyChampions ?? [null, null, null, null, null]
+  );
   const [showAdvice, setShowAdvice] = useState(false);
+
+  // Sync from external initial values (e.g., LCU auto-fill)
+  useEffect(() => {
+    if (initialMyChampion !== undefined) setMyChampion(initialMyChampion);
+  }, [initialMyChampion]);
+
+  useEffect(() => {
+    if (initialMyRole !== undefined) setMyRole(initialMyRole);
+  }, [initialMyRole]);
+
+  useEffect(() => {
+    if (initialEnemyChampions) setEnemyChampions(initialEnemyChampions);
+  }, [initialEnemyChampions]);
 
   const ROLES: Role[] = ["TOP", "JGL", "MID", "ADC", "SUP"];
 

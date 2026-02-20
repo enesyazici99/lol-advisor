@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { Role } from "@/lib/riot/constants";
+import type { LcuPhase } from "@/hooks/useLCU";
 
 type Theme = "light" | "dark";
 
@@ -12,6 +13,8 @@ interface AppState {
   theme: Theme;
   advisorRole: Role | null;
   advisorVsChampion: string | null;
+  lcuPhase: LcuPhase;
+  lcuSummonerName: string | null;
   setSelectedRole: (role: Role | null) => void;
   setSearchQuery: (query: string) => void;
   setVersion: (version: string) => void;
@@ -21,6 +24,8 @@ interface AppState {
   setTheme: (theme: Theme) => void;
   setAdvisorRole: (role: Role | null) => void;
   setAdvisorVsChampion: (champion: string | null) => void;
+  setLcuPhase: (phase: LcuPhase) => void;
+  setLcuSummonerName: (name: string | null) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -32,6 +37,8 @@ export const useAppStore = create<AppState>((set) => ({
   theme: "dark",
   advisorRole: null,
   advisorVsChampion: null,
+  lcuPhase: "disconnected",
+  lcuSummonerName: null,
   setSelectedRole: (role) => set({ selectedRole: role }),
   setSearchQuery: (query) => set({ searchQuery: query }),
   setVersion: (version) => set({ version }),
@@ -39,6 +46,8 @@ export const useAppStore = create<AppState>((set) => ({
   setSummonerExpandedMatchId: (id) => set({ summonerExpandedMatchId: id }),
   setAdvisorRole: (role) => set({ advisorRole: role }),
   setAdvisorVsChampion: (champion) => set({ advisorVsChampion: champion }),
+  setLcuPhase: (phase) => set({ lcuPhase: phase }),
+  setLcuSummonerName: (name) => set({ lcuSummonerName: name }),
   toggleTheme: () =>
     set((state) => {
       const next = state.theme === "dark" ? "light" : "dark";

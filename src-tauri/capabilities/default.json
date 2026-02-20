@@ -1,0 +1,13 @@
+{
+  "identifier": "default",
+  "description": "Capability for the main window (localhost)",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-close",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:window:allow-set-focus",
+    "shell:allow-open"
+  ]
+}

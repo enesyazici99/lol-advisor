@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useAppStore } from "@/stores/appStore";
+import { isTauri } from "@/lib/desktop/tauri";
+import { LCUStatus } from "@/components/desktop/LCUStatus";
 
 export function Header() {
   const version = useAppStore((s) => s.version);
@@ -27,6 +29,8 @@ export function Header() {
         >
           Live
         </Link>
+
+        {isTauri() && <LCUStatus />}
 
         {version && (
           <span className="hidden sm:inline font-mono text-xs text-fg-muted bg-surface-tertiary px-3 py-1.5 rounded-lg">

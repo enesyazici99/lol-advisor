@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSummonerAccount } from "@/hooks/useSummoner";
 import { useLiveGame } from "@/hooks/useLiveGame";
@@ -10,7 +10,12 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { LiveGameDashboard } from "@/components/live/LiveGameDashboard";
 import { ManualTeamInput } from "@/components/live/ManualTeamInput";
 import { SEARCH_REGIONS } from "@/lib/riot/types";
+import { isTauri } from "@/lib/desktop/tauri";
+import { useLCU } from "@/hooks/useLCU";
+import { buildChampionKeyToId, extractChampSelectData } from "@/lib/desktop/lcu-utils";
+import { ChampSelectOverlay } from "@/components/desktop/ChampSelectOverlay";
 import type { DDragonChampion } from "@/lib/riot/ddragon";
+import type { Role } from "@/lib/riot/constants";
 
 interface LivePageClientProps {
   champions: Record<string, DDragonChampion>;
@@ -48,6 +53,35 @@ export function LivePageClient({ champions, version }: LivePageClientProps) {
 
   const [mode, setMode] = useState<"live" | "manual">(
     activeSearch ? "live" : "manual"
+  );
+
+  // LCU auto-fill state (from ChampSelectOverlay → ManualTeamInput)
+  const [lcuMyChampion, setLcuMyChampion] = useState<string | null>(null);
+  const [lcuMyRole, setLcuMyRole] = useState<Role | null>(null);
+  const [lcuEnemies, setLcuEnemies] = useState<(string | null)[] | undefined>(undefined);
+
+  // Tauri / LCU integration
+  const isDesktop = isTauri();
+  const { phase, champSelectSession } = useLCU();
+
+  // Champion key map for LCU numeric ID → DDragon string key
+  const champKeyMap = useMemo(() => buildChampionKeyToId(champions), [champions]);
+
+  // Extract champ select data when available
+  const champSelectData = useMemo(() => {
+    if (!champSelectSession) return null;
+    return extractChampSelectData(champSelectSession, champKeyMap);
+  }, [champSelectSession, champKeyMap]);
+
+  // Handle "Get Build Advice" from ChampSelectOverlay
+  const handleLcuAdvice = useCallback(
+    (myChampion: string | null, myRole: Role | null, enemies: (string | null)[]) => {
+      setLcuMyChampion(myChampion);
+      setLcuMyRole(myRole);
+      setLcuEnemies(enemies);
+      setMode("manual");
+    },
+    []
   );
 
   // Fetch summoner
@@ -91,6 +125,15 @@ export function LivePageClient({ champions, version }: LivePageClientProps) {
           Track active games or manually input team compositions for analysis
         </p>
       </div>
+
+      {/* LCU Champion Select Overlay (Tauri only) */}
+      {isDesktop && phase === "champ-select" && champSelectData && (
+        <ChampSelectOverlay
+          data={champSelectData}
+          version={version}
+          onGetAdvice={handleLcuAdvice}
+        />
+      )}
 
       {/* Mode Toggle */}
       <div className="flex gap-2">
@@ -198,7 +241,13 @@ export function LivePageClient({ champions, version }: LivePageClientProps) {
           )}
         </>
       ) : (
-        <ManualTeamInput champions={champions} version={version} />
+        <ManualTeamInput
+          champions={champions}
+          version={version}
+          initialMyChampion={lcuMyChampion}
+          initialMyRole={lcuMyRole}
+          initialEnemyChampions={lcuEnemies}
+        />
       )}
     </div>
   );

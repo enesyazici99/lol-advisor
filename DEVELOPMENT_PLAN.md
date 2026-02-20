@@ -1,6 +1,6 @@
 # LOL Advisor — Development Plan
 
-> Son guncelleme: 2026-02-20 (FAZ 5 tamamlandi)
+> Son guncelleme: 2026-02-20 (FAZ 6 tamamlandi)
 
 ---
 
@@ -14,7 +14,7 @@
 | FAZ 3 | Matchup Build Advisor | TAMAMLANDI |
 | FAZ 4 | Canli Mac Entegrasyonu | TAMAMLANDI |
 | FAZ 5 | Polish + Production | TAMAMLANDI |
-| FAZ 6 | Desktop Companion | BASLANMADI |
+| FAZ 6 | Desktop Companion (Tauri v2) | TAMAMLANDI |
 
 ---
 
@@ -278,13 +278,41 @@
 
 ---
 
-## FAZ 6: Desktop Companion — BASLANMADI
+## FAZ 6: Desktop Companion (Tauri v2) — TAMAMLANDI
 
-| # | Gorev | Durum |
-|---|-------|-------|
-| 65 | Electron/Tauri desktop app | EKSIK |
-| 66 | LCU API entegrasyonu | EKSIK |
-| 67 | WebSocket -> web app | EKSIK |
+### Mimari
+- Tauri v2 (Rust backend, WebView frontend)
+- Dev modda `next dev` sarar (localhost:3000), production Vercel URL yukler
+- Rust backend SADECE LCU islemleri yapar (lockfile okuma, REST, WebSocket)
+- Frontend `window.__TAURI_INTERNALS__` ile Tauri ortamini tespit eder
+
+### Rust Backend
+
+| # | Gorev | Durum | Notlar |
+|---|-------|-------|--------|
+| 65 | Tauri v2 scaffold + config | DONE | tauri.conf.json, Cargo.toml, build.rs |
+| 66 | LCU types (types.rs) | DONE | LcuCredentials, ChampSelectSession, CurrentSummoner, LcuEvent |
+| 67 | LCU detector (detector.rs) | DONE | 4 lockfile path + wmic fallback |
+| 68 | LCU REST client (client.rs) | DONE | reqwest, self-signed cert, Basic auth |
+| 69 | LCU WebSocket (websocket.rs) | DONE | tokio-tungstenite, WAMP subscribe, event filter |
+| 70 | Tauri commands (lib.rs) | DONE | detect_client, get_champ_select, get_current_summoner, start_lcu_watcher |
+| 71 | System tray + hide-to-tray | DONE | Show Window / Quit, close→hide |
+| 72 | Capabilities (IPC permissions) | DONE | default.json (local), remote-lcu.json (Vercel) |
+
+### Frontend
+
+| # | Gorev | Durum | Notlar |
+|---|-------|-------|--------|
+| 73 | Tauri API wrapper (tauri.ts) | DONE | isTauri(), dynamic import, invoke/listen wrappers |
+| 74 | LCU utils (lcu-utils.ts) | DONE | championIdToKey(), extractChampSelectData(), position→role |
+| 75 | useLCU hook | DONE | 5s polling, WebSocket events, reconnect, phase state |
+| 76 | LCUStatus component | DONE | 3-state indicator (red/green/yellow) |
+| 77 | ChampSelectOverlay component | DONE | Real-time pick/ban, "Get Build Advice" button |
+| 78 | Store update (appStore.ts) | DONE | lcuPhase, lcuSummonerName state |
+| 79 | Header integration | DONE | LCUStatus shown only in Tauri |
+| 80 | Providers DesktopInit | DONE | useLCU → store sync |
+| 81 | ManualTeamInput initial props | DONE | initialMyChampion, initialMyRole, initialEnemyChampions |
+| 82 | LivePageClient LCU integration | DONE | ChampSelectOverlay + auto-fill |
 
 ---
 
@@ -360,15 +388,22 @@ lol-advisor/
 │   │   ├── TeamCard.tsx
 │   │   ├── LiveGameDashboard.tsx
 │   │   └── ManualTeamInput.tsx
+│   ├── desktop/                            # DONE (FAZ 6)
+│   │   ├── LCUStatus.tsx
+│   │   └── ChampSelectOverlay.tsx
 │   └── ui/ (CyberCard, CyberButton, etc.) # DONE
 ├── hooks/
 │   ├── useDataDragon.ts                    # DONE
 │   ├── useProBuilds.ts                     # DONE
 │   ├── useSummoner.ts                      # DONE (FAZ 2)
 │   ├── useAdvisor.ts                       # DONE (FAZ 3)
-│   └── useLiveGame.ts                      # DONE (FAZ 4)
-├── stores/appStore.ts                      # DONE (FAZ 3 state eklendi)
+│   ├── useLiveGame.ts                      # DONE (FAZ 4)
+│   └── useLCU.ts                           # DONE (FAZ 6)
+├── stores/appStore.ts                      # DONE (FAZ 6 lcuPhase/lcuSummonerName eklendi)
 ├── lib/
+│   ├── desktop/                            # DONE (FAZ 6)
+│   │   ├── tauri.ts                        # isTauri(), invoke/listen wrappers
+│   │   └── lcu-utils.ts                    # championIdToKey(), extractChampSelectData()
 │   ├── supabase/ (client, server, types)   # DONE (FAZ 3 tipler eklendi)
 │   ├── riot/
 │   │   ├── ddragon.ts                      # DONE
@@ -389,6 +424,22 @@ lol-advisor/
 │   ├── seed-champions.ts                   # DONE
 │   └── initial-scrape.ts                   # DONE (172 champion)
 ├── supabase/migrations/001_initial.sql     # DONE (tum tablolar)
+├── src-tauri/                              # DONE (FAZ 6)
+│   ├── Cargo.toml
+│   ├── tauri.conf.json
+│   ├── build.rs
+│   ├── capabilities/
+│   │   ├── default.json
+│   │   └── remote-lcu.json
+│   └── src/
+│       ├── main.rs
+│       ├── lib.rs
+│       └── lcu/
+│           ├── mod.rs
+│           ├── types.rs
+│           ├── detector.rs
+│           ├── client.rs
+│           └── websocket.rs
 ├── __tests__/                              # 109 unit/component + 17 e2e
 ├── vercel.json                             # DONE (4 cron job)
 ├── tailwind.config.ts                      # DONE
@@ -413,4 +464,7 @@ lol-advisor/
 
 ## SONRAKI ADIM
 
-**FAZ 6 — Desktop Companion:** Electron/Tauri desktop app, LCU API entegrasyonu, WebSocket iletisimi.
+FAZ 0-6 tamamlandi. Olasi ilerlemeler:
+- Tauri app build + dağıtım (MSI/EXE installer)
+- Riot Production API key alındığında canlı oyun tespiti iyileştirme
+- Mac/Linux desteği (LCU lockfile path'leri eklenmeli)

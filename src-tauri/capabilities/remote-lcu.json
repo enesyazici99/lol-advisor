@@ -1,0 +1,16 @@
+{
+  "identifier": "remote-lcu",
+  "description": "Capability for remote URL (Vercel) to access LCU commands",
+  "remote": {
+    "urls": ["https://lol-advisor.vercel.app/*"]
+  },
+  "permissions": [
+    "core:default",
+    "core:window:allow-close",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:window:allow-set-focus",
+    "core:event:allow-listen",
+    "core:event:allow-emit"
+  ]
+}
