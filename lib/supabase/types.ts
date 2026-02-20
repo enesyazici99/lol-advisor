@@ -53,6 +53,37 @@ export interface MetaBuild {
   updated_at: string;
 }
 
+export interface MatchupData {
+  id: string;
+  champion_key: string;
+  vs_champion_key: string;
+  role: string;
+  win_rate: number;
+  games: number;
+  delta: number;
+  recommended_items: number[];
+  recommended_runes: { keystone: number; secondary: number } | null;
+  recommended_spells: { spell1: number; spell2: number } | null;
+  updated_at: string;
+}
+
+export interface ChampionTag {
+  id: string;
+  champion_key: string;
+  tags: string[];
+  updated_at: string;
+}
+
+export interface PrecomputedScore {
+  id: string;
+  champion_key: string;
+  role: string;
+  general_win_rate: number;
+  pick_rate: number;
+  tier: string;
+  updated_at: string;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -70,6 +101,21 @@ export interface Database {
         Row: MetaBuild;
         Insert: Omit<MetaBuild, "id" | "updated_at">;
         Update: Partial<Omit<MetaBuild, "id" | "updated_at">>;
+      };
+      matchup_data: {
+        Row: MatchupData;
+        Insert: Omit<MatchupData, "id" | "updated_at">;
+        Update: Partial<Omit<MatchupData, "id" | "updated_at">>;
+      };
+      champion_tags: {
+        Row: ChampionTag;
+        Insert: Omit<ChampionTag, "id" | "updated_at">;
+        Update: Partial<Omit<ChampionTag, "id" | "updated_at">>;
+      };
+      precomputed_scores: {
+        Row: PrecomputedScore;
+        Insert: Omit<PrecomputedScore, "id" | "updated_at">;
+        Update: Partial<Omit<PrecomputedScore, "id" | "updated_at">>;
       };
     };
   };

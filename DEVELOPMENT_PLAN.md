@@ -1,6 +1,6 @@
 # LOL Advisor — Development Plan
 
-> Son guncelleme: 2026-02-19
+> Son guncelleme: 2026-02-20
 
 ---
 
@@ -10,8 +10,8 @@
 |-----|--------|-------|
 | FAZ 0 | Altyapi + Temel Kurulum | TAMAMLANDI |
 | FAZ 1 | ProBuilds Explorer (Core MVP) | TAMAMLANDI (veri limitleri haric) |
-| FAZ 2 | Summoner Arama + Match History | BASLANMADI |
-| FAZ 3 | Matchup Build Advisor | BASLANMADI |
+| FAZ 2 | Summoner Arama + Match History | TAMAMLANDI |
+| FAZ 3 | Matchup Build Advisor | TAMAMLANDI |
 | FAZ 4 | Canli Mac Entegrasyonu | BASLANMADI |
 | FAZ 5 | Polish + Production | BASLANMADI |
 | FAZ 6 | Desktop Companion | BASLANMADI |
@@ -83,7 +83,7 @@
 | 17k | OTP toggle | EKSIK | Veri yok, filtre yok |
 | 18a | Mac detay — accordion (ExpandedMatchDetail) | DONE | Inline expand, ayri sayfa yok |
 | 18b | MatchStats (KDA, CS, Gold, Damage, Duration) | DONE | Sadece mevcut verileri gosteriyor (null olanlar gizli) |
-| 18c | ItemTimeline bileseni | DONE | Bileşen hazir ama veri yok, veri yoksa gizleniyor |
+| 18c | ItemTimeline bileseni | DONE | Bilesen hazir ama veri yok, veri yoksa gizleniyor |
 | 18d | SkillTimeline bileseni | DONE | Meta skill_order fallback gosteriyor, veri yoksa gizleniyor |
 | 18e | Ayri mac detay sayfasi (`/match/[matchId]`) | EKSIK | Yok, accordion ile inline gosterim var |
 | 19 | Loading states, error states, empty states | DONE | |
@@ -133,41 +133,68 @@
 
 ---
 
-## FAZ 2: Summoner Arama + Match History — BASLANMADI
-
-Riot API wrapper (`lib/riot/api.ts`) hazir ama kullanilmiyor.
+## FAZ 2: Summoner Arama + Match History — TAMAMLANDI
 
 | # | Gorev | Durum | Notlar |
 |---|-------|-------|--------|
-| 21 | `/api/riot/account` endpoint (gameName#tagLine -> PUUID) | EKSIK | `api.ts`'de fonksiyon var ama route yok |
-| 22 | `/api/riot/match-history` endpoint | EKSIK | `api.ts`'de fonksiyon var ama route yok |
-| 23 | Summoner arama sayfasi veya ana sayfada arama | EKSIK | |
-| 24 | Match history listesi (champion, KDA, build, W/L, tarih) | EKSIK | |
-| 25 | Her mac tiklanabilir -> detay | EKSIK | |
-
-**Hazir olan:** `lib/riot/api.ts` — getSummonerByRiotId, getMatchIds, getMatch, getMatchTimeline fonksiyonlari yazilmis.
+| 21 | `/api/riot/account` endpoint | DONE | gameName#tagLine -> PUUID + summoner profile |
+| 22 | `/api/riot/matches` endpoint | DONE | Match history with pagination |
+| 23 | `/api/riot/match/[matchId]` endpoint | DONE | Detayli mac verisi + timeline |
+| 24 | `lib/riot/api.ts` rate limiter | DONE | Sliding window (20/1s, 100/120s) |
+| 25 | `lib/riot/transforms.ts` | DONE | normalizePosition, transformMatch, transformTimeline, transformMatchDetail |
+| 26 | `hooks/useSummoner.ts` | DONE | useSummonerAccount, useMatchHistory, useMatchDetail (SWR) |
+| 27 | `/summoner/[region]/[slug]` sayfasi | DONE | Server component + SummonerPageClient |
+| 28 | Summoner profil karti | DONE | Level, ikon, isim#tag |
+| 29 | Match history listesi | DONE | Champion, KDA, items, runes, spells, W/L, tarih |
+| 30 | Match detail expand | DONE | Tum katilimcilar, item timeline, skill order |
+| 31 | Region secimi | DONE | SEARCH_REGIONS dropdown |
 
 ---
 
-## FAZ 3: Matchup Build Advisor — BASLANMADI
+## FAZ 3: Matchup Build Advisor — TAMAMLANDI
 
-| # | Gorev | Durum |
-|---|-------|-------|
-| 26 | `lib/scraper/lolalytics.ts` scraper | EKSIK |
-| 27 | Matchup data scraping cron job | EKSIK |
-| 28a | `lib/engine/team-analyzer.ts` | EKSIK |
-| 28b | `lib/engine/scoring.ts` | EKSIK |
-| 28c | `lib/engine/recommendation.ts` | EKSIK |
-| 28d | `lib/engine/champion-tags.ts` | EKSIK |
-| 29 | Pre-computed scores cron job | EKSIK |
-| 30 | `/api/builds/recommend` endpoint | EKSIK |
-| 31a | Advisor sayfasi (`/advisor`) | EKSIK |
-| 31b | ChampionPicker bileseni | EKSIK |
-| 31c | TeamBuilder bileseni | EKSIK |
-| 31d | BuildRecommendation paneli | EKSIK |
-| 31e | MatchupInsight bileseni | EKSIK |
+### Backend
 
-**DB tablolari hazir:** `matchup_data`, `champion_tags`, `precomputed_scores` tablolari migration'da olusturulmus (bos).
+| # | Gorev | Durum | Notlar |
+|---|-------|-------|--------|
+| 32 | `lib/scraper/lolalytics.ts` | DONE | Cheerio scraper: scrapeCounters + scrapeBuild |
+| 33 | `lib/engine/champion-tags.ts` | DONE | 100+ champion elle zenginlestirilmis tag mapping |
+| 34 | `lib/engine/scoring.ts` | DONE | calculateTierScore (0.6/0.25/0.15), getCounterPicks, getWeakPicks |
+| 35 | `lib/engine/recommendation.ts` | DONE | getMatchupBuild (matchup-specific + meta fallback) |
+| 36 | `/api/cron/scrape-matchups/route.ts` | DONE | Batch 30 champion, 5 rol, upsert matchup_data |
+| 37 | `/api/cron/compute-tags/route.ts` | DONE | DDragon + CHAMPION_TAG_MAP -> champion_tags |
+| 38 | `/api/builds/counters/route.ts` | DONE | GET ?champion&role -> bestPicks + worstPicks |
+| 39 | `/api/builds/recommend/route.ts` | DONE | GET ?champion&role&vs -> matchupBuild + counterPicks |
+
+### Frontend
+
+| # | Gorev | Durum | Notlar |
+|---|-------|-------|--------|
+| 40 | `hooks/useAdvisor.ts` | DONE | useCounters, useRecommendation (SWR) |
+| 41 | `stores/appStore.ts` guncelleme | DONE | advisorRole, advisorVsChampion state |
+| 42 | `components/advisor/RolePicker.tsx` | DONE | 5 rol butonu, auto-detect badge |
+| 43 | `components/advisor/ChampionSelect.tsx` | DONE | Searchable champion grid |
+| 44 | `components/advisor/CounterList.tsx` | DONE | Strong/Weak Against tabs, tier badges (S+/S/A/B/C) |
+| 45 | `components/advisor/MatchupBuild.tsx` | DONE | Items/runes/spells paneli, meta fallback uyarisi |
+| 46 | `app/advisor/page.tsx` | DONE | Server component + Suspense |
+| 47 | `app/advisor/AdvisorPageClient.tsx` | DONE | Rol/champion secim + sonuclar, summoner auto-detect |
+| 48 | Header nav link | DONE | "Advisor" linki |
+
+### Altyapi
+
+| # | Gorev | Durum | Notlar |
+|---|-------|-------|--------|
+| 49 | `lib/supabase/types.ts` guncelleme | DONE | MatchupData, ChampionTag, PrecomputedScore |
+| 50 | `vercel.json` cron ekleme | DONE | scrape-matchups (12h), compute-tags (daily) |
+| 51 | Scoring unit testleri | DONE | 15 test (calculateTier, calculateTierScore, scoreMatchup) |
+
+### Testler
+
+| Tur | Sayi | Durum |
+|-----|------|-------|
+| Vitest (unit + component) | 109 | DONE (94 mevcut + 15 yeni) |
+| Playwright (E2E) | 17 | DONE |
+| Toplam | 126 | HEPSI GECIYOR |
 
 ---
 
@@ -175,11 +202,14 @@ Riot API wrapper (`lib/riot/api.ts`) hazir ama kullanilmiyor.
 
 | # | Gorev | Durum |
 |---|-------|-------|
-| 32 | Spectator-V5 API entegrasyonu | EKSIK |
-| 33 | LiveGameDashboard sayfasi | EKSIK |
-| 34 | Otomatik champion detect + advisor tetikleme | EKSIK |
-| 35 | 30 saniye polling | EKSIK |
-| 36 | Spectator calismazsa fallback | EKSIK |
+| 52 | Spectator-V5 API entegrasyonu (`lib/riot/api.ts`'e ekle) | EKSIK |
+| 53 | `/api/riot/spectator/route.ts` endpoint | EKSIK |
+| 54 | `hooks/useLiveGame.ts` (polling hook) | EKSIK |
+| 55 | `/live/page.tsx` LiveGame sayfasi | EKSIK |
+| 56 | LiveGameDashboard bileseni | EKSIK |
+| 57 | Otomatik champion detect + advisor tetikleme | EKSIK |
+| 58 | 30 saniye polling | EKSIK |
+| 59 | Spectator calismazsa fallback | EKSIK |
 
 ---
 
@@ -187,11 +217,11 @@ Riot API wrapper (`lib/riot/api.ts`) hazir ama kullanilmiyor.
 
 | # | Gorev | Durum |
 |---|-------|-------|
-| 37 | Responsive design (mobile) | KISMEN (grid responsive ama detaylar degil) |
-| 38 | SEO (champion sayfalari icin SSG/ISR) | EKSIK |
-| 39 | Vercel cron job konfigurasyonu | DONE (vercel.json hazir) |
-| 40 | Production Riot API key basvurusu | EKSIK |
-| 41 | Performance optimizasyonu | EKSIK |
+| 60 | Responsive design (mobile) | KISMEN (grid responsive ama detaylar degil) |
+| 61 | SEO (champion sayfalari icin SSG/ISR) | EKSIK |
+| 62 | Vercel cron job konfigurasyonu | DONE (vercel.json hazir) |
+| 63 | Production Riot API key basvurusu | EKSIK |
+| 64 | Performance optimizasyonu | EKSIK |
 
 ---
 
@@ -199,9 +229,9 @@ Riot API wrapper (`lib/riot/api.ts`) hazir ama kullanilmiyor.
 
 | # | Gorev | Durum |
 |---|-------|-------|
-| 42 | Electron/Tauri desktop app | EKSIK |
-| 43 | LCU API entegrasyonu | EKSIK |
-| 44 | WebSocket -> web app | EKSIK |
+| 65 | Electron/Tauri desktop app | EKSIK |
+| 66 | LCU API entegrasyonu | EKSIK |
+| 67 | WebSocket -> web app | EKSIK |
 
 ---
 
@@ -218,15 +248,29 @@ lol-advisor/
 │   ├── champion/[key]/
 │   │   ├── page.tsx                        # DONE
 │   │   └── ChampionPageClient.tsx          # DONE
+│   ├── summoner/[region]/[slug]/
+│   │   ├── page.tsx                        # DONE (FAZ 2)
+│   │   └── SummonerPageClient.tsx          # DONE (FAZ 2)
+│   ├── advisor/
+│   │   ├── page.tsx                        # DONE (FAZ 3)
+│   │   └── AdvisorPageClient.tsx           # DONE (FAZ 3)
 │   └── api/
 │       ├── ddragon/version/route.ts        # DONE
 │       ├── builds/
 │       │   ├── pro-matches/route.ts        # DONE
-│       │   └── meta/route.ts               # DONE
+│       │   ├── meta/route.ts               # DONE
+│       │   ├── counters/route.ts           # DONE (FAZ 3)
+│       │   └── recommend/route.ts          # DONE (FAZ 3)
+│       ├── riot/
+│       │   ├── account/route.ts            # DONE (FAZ 2)
+│       │   ├── matches/route.ts            # DONE (FAZ 2)
+│       │   └── match/[matchId]/route.ts    # DONE (FAZ 2)
 │       ├── scraper/trigger/route.ts        # DONE
 │       └── cron/
-│           ├── scrape-probuilds/route.ts   # DONE (172 champ, batch=30)
-│           └── scrape-meta/route.ts        # DONE
+│           ├── scrape-probuilds/route.ts   # DONE
+│           ├── scrape-meta/route.ts        # DONE
+│           ├── scrape-matchups/route.ts    # DONE (FAZ 3)
+│           └── compute-tags/route.ts       # DONE (FAZ 3)
 ├── components/
 │   ├── layout/ (Header, SearchBar, Footer) # DONE
 │   ├── champions/ (Grid, Card, RoleFilter) # DONE
@@ -242,27 +286,47 @@ lol-advisor/
 │   │   └── detail/
 │   │       ├── ExpandedMatchDetail.tsx
 │   │       ├── MatchStats.tsx
-│   │       ├── ItemTimeline.tsx            # UI hazir, veri yok
-│   │       └── SkillTimeline.tsx           # UI hazir, veri yok
+│   │       ├── ItemTimeline.tsx
+│   │       └── SkillTimeline.tsx
+│   ├── summoner/                           # DONE (FAZ 2)
+│   │   ├── MatchHistoryRow.tsx
+│   │   ├── SummonerProfile.tsx
+│   │   └── MatchDetailExpanded.tsx
+│   ├── advisor/                            # DONE (FAZ 3)
+│   │   ├── RolePicker.tsx
+│   │   ├── ChampionSelect.tsx
+│   │   ├── CounterList.tsx
+│   │   └── MatchupBuild.tsx
 │   └── ui/ (CyberCard, CyberButton, etc.) # DONE
 ├── hooks/
 │   ├── useDataDragon.ts                    # DONE
-│   └── useProBuilds.ts                     # DONE
-├── stores/appStore.ts                      # DONE
+│   ├── useProBuilds.ts                     # DONE
+│   ├── useSummoner.ts                      # DONE (FAZ 2)
+│   └── useAdvisor.ts                       # DONE (FAZ 3)
+├── stores/appStore.ts                      # DONE (FAZ 3 state eklendi)
 ├── lib/
-│   ├── supabase/ (client, server, types)   # DONE
+│   ├── supabase/ (client, server, types)   # DONE (FAZ 3 tipler eklendi)
 │   ├── riot/
 │   │   ├── ddragon.ts                      # DONE
-│   │   ├── api.ts                          # DONE (kullanilmiyor)
+│   │   ├── api.ts                          # DONE (FAZ 2'de aktif)
+│   │   ├── rateLimiter.ts                  # DONE (FAZ 2)
+│   │   ├── transforms.ts                   # DONE (FAZ 2)
+│   │   ├── types.ts                        # DONE (FAZ 2)
 │   │   └── constants.ts                    # DONE
-│   ├── scraper/probuildstats.ts            # DONE
+│   ├── scraper/
+│   │   ├── probuildstats.ts                # DONE
+│   │   └── lolalytics.ts                   # DONE (FAZ 3)
+│   ├── engine/                             # DONE (FAZ 3)
+│   │   ├── champion-tags.ts
+│   │   ├── scoring.ts
+│   │   └── recommendation.ts
 │   └── utils/ (cache, helpers)             # DONE
 ├── scripts/
 │   ├── seed-champions.ts                   # DONE
 │   └── initial-scrape.ts                   # DONE (172 champion)
 ├── supabase/migrations/001_initial.sql     # DONE (tum tablolar)
-├── __tests__/                              # 86 test, hepsi geciyor
-├── vercel.json                             # DONE
+├── __tests__/                              # 109 unit/component + 17 e2e = 126 test
+├── vercel.json                             # DONE (4 cron job)
 ├── tailwind.config.ts                      # DONE
 ├── vitest.config.ts                        # DONE
 └── playwright.config.ts                    # DONE
@@ -277,25 +341,12 @@ lol-advisor/
 | champions | 172 | Tam (DDragon'dan seed edildi) |
 | pro_matches | ~3440 | 172 champion x 20 mac (scrape v3) |
 | meta_builds | ~172 | Her champion icin aggregate (role=ALL) |
-| matchup_data | 0 | FAZ 3'te doldurulacak |
-| champion_tags | 0 | FAZ 3'te doldurulacak |
-| precomputed_scores | 0 | FAZ 3'te doldurulacak |
-
-### pro_matches tablosunda NULL olan alanlar
-- `role` — yeni scrape'lerde inferRole() ile dolduruluyor (eski kayitlar null olabilir)
-- `cs`, `gold`, `damage`, `duration_minutes` — probuildstats bu verileri sunmuyor
-- `skill_order` — match bazinda yok, meta skill_order fallback olarak gosteriliyor
-- `item_timeline` — match bazinda yok, probuildstats'ta bu detay yok
-- `rune_primary_tree` — sadece keystone var, tree ID yok
+| matchup_data | 0 | Cron job ile dolacak (scrape-matchups her 12 saat) |
+| champion_tags | 0 | Cron job ile dolacak (compute-tags gunluk) |
+| precomputed_scores | 0 | FAZ 4+ ile dolacak |
 
 ---
 
-## SONRAKI ADIM ONERISI
+## SONRAKI ADIM
 
-FAZ 1 temel islevleri tamamlandi. Siradaki secenekler:
-
-1. **FAZ 2 — Summoner Arama + Match History** (Riot API kullanarak)
-2. **E4b/E5b/E6b — Detayli mac verileri** (Riot Match-V5 API ile CS, Gold, Timeline, Skill Order)
-3. **FAZ 3 — Matchup Build Advisor** (lolalytics scraper + puanlama motoru)
-
-Riot API entegrasyonu hem FAZ 2 hem detayli veri eksiklerini kapsar.
+**FAZ 4 — Canli Mac Entegrasyonu:** Spectator-V5 API ile oyuncunun aktif macini tespit edip, otomatik olarak rakip champion'lari algilayip counter pick + build onerisi sunma. 30 saniye polling ile canli guncelleme.

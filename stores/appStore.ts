@@ -10,6 +10,8 @@ interface AppState {
   expandedMatchId: string | null;
   summonerExpandedMatchId: string | null;
   theme: Theme;
+  advisorRole: Role | null;
+  advisorVsChampion: string | null;
   setSelectedRole: (role: Role | null) => void;
   setSearchQuery: (query: string) => void;
   setVersion: (version: string) => void;
@@ -17,6 +19,8 @@ interface AppState {
   setSummonerExpandedMatchId: (id: string | null) => void;
   toggleTheme: () => void;
   setTheme: (theme: Theme) => void;
+  setAdvisorRole: (role: Role | null) => void;
+  setAdvisorVsChampion: (champion: string | null) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -26,11 +30,15 @@ export const useAppStore = create<AppState>((set) => ({
   expandedMatchId: null,
   summonerExpandedMatchId: null,
   theme: "dark",
+  advisorRole: null,
+  advisorVsChampion: null,
   setSelectedRole: (role) => set({ selectedRole: role }),
   setSearchQuery: (query) => set({ searchQuery: query }),
   setVersion: (version) => set({ version }),
   setExpandedMatchId: (id) => set({ expandedMatchId: id }),
   setSummonerExpandedMatchId: (id) => set({ summonerExpandedMatchId: id }),
+  setAdvisorRole: (role) => set({ advisorRole: role }),
+  setAdvisorVsChampion: (champion) => set({ advisorVsChampion: champion }),
   toggleTheme: () =>
     set((state) => {
       const next = state.theme === "dark" ? "light" : "dark";

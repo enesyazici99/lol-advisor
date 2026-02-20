@@ -15,6 +15,13 @@ export function Header() {
       </Link>
 
       <div className="flex items-center gap-3">
+        <Link
+          href="/advisor"
+          className="text-sm font-medium text-fg-secondary hover:text-accent transition-colors px-3 py-1.5"
+        >
+          Advisor
+        </Link>
+
         {version && (
           <span className="font-mono text-xs text-fg-muted bg-surface-tertiary px-3 py-1.5 rounded-lg">
             Patch {version}

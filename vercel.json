@@ -7,6 +7,14 @@
     {
       "path": "/api/cron/scrape-meta",
       "schedule": "0 1 * * *"
+    },
+    {
+      "path": "/api/cron/scrape-matchups",
+      "schedule": "0 */12 * * *"
+    },
+    {
+      "path": "/api/cron/compute-tags",
+      "schedule": "0 3 * * *"
     }
   ]
 }
