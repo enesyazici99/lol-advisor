@@ -35,15 +35,16 @@ export function ProMatchList({ championKey, role, region }: ProMatchListProps) {
   return (
     <div>
       {/* Table header */}
-      <div className="flex items-center gap-3 px-4 py-2.5 border-b border-border bg-surface-secondary">
-        <div className="w-1 flex-shrink-0" />
-        <span className="text-xs font-semibold text-fg-muted uppercase tracking-wide w-14">Time</span>
-        <span className="text-xs font-semibold text-fg-muted uppercase tracking-wide w-36">Player</span>
-        <span className="text-xs font-semibold text-fg-muted uppercase tracking-wide w-16">VS</span>
-        <span className="text-xs font-semibold text-fg-muted uppercase tracking-wide w-24 text-center">KDA</span>
-        <span className="text-xs font-semibold text-fg-muted uppercase tracking-wide flex-shrink-0">Runes</span>
-        <span className="text-xs font-semibold text-fg-muted uppercase tracking-wide flex-shrink-0 ml-3">Spells</span>
-        <span className="text-xs font-semibold text-fg-muted uppercase tracking-wide flex-1 ml-2">Items</span>
+      <div className="flex items-center gap-3 px-4 py-2.5 border-b border-border bg-surface-tertiary">
+        <div className="w-[3px] flex-shrink-0" />
+        <span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider w-14">Time</span>
+        <span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider w-36">Player</span>
+        <span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider w-16">Region</span>
+        <span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider w-16">VS</span>
+        <span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider w-24 text-center">KDA</span>
+        <span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider flex-shrink-0">Runes</span>
+        <span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider flex-shrink-0 ml-3">Spells</span>
+        <span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider flex-1 ml-2">Items</span>
         <div className="w-6 flex-shrink-0" />
       </div>
 

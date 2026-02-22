@@ -27,18 +27,20 @@ export function ProMatchRow({ match }: ProMatchRowProps) {
     <motion.div
       layout
       className={`border-b border-border transition-colors ${
-        match.win ? "bg-win-bg" : "bg-loss-bg"
+        match.win
+          ? "border-l-[3px] border-l-blue-500 bg-win-bg/40"
+          : "border-l-[3px] border-l-red-500 bg-loss-bg/40"
       } ${isExpanded ? "ring-1 ring-inset ring-accent/20" : ""}`}
     >
       <button
         type="button"
-        className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 cursor-pointer hover:bg-accent-muted/50 transition-colors text-left"
+        className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 cursor-pointer hover:bg-surface-secondary/60 transition-colors text-left"
         onClick={() => setExpandedMatchId(isExpanded ? null : match.id)}
         aria-expanded={isExpanded}
         aria-label={`${match.pro_player} ${match.win ? "win" : "loss"} ${formatKDA(match.kills, match.deaths, match.assists)}`}
       >
-        {/* Win/Loss indicator bar */}
-        <div className={`w-1 h-8 rounded-full flex-shrink-0 ${match.win ? "bg-win" : "bg-loss"}`} />
+        {/* Spacer to align with the 3px left border */}
+        <div className="w-0 flex-shrink-0" />
 
         {/* Time */}
         <span className="hidden sm:block font-mono text-xs text-fg-muted w-14 flex-shrink-0">
@@ -52,6 +54,13 @@ export function ProMatchRow({ match }: ProMatchRowProps) {
             team={match.team}
             region={match.region}
           />
+        </div>
+
+        {/* Region */}
+        <div className="hidden md:block w-16 flex-shrink-0">
+          <span className="text-xs font-medium text-fg-secondary bg-surface-tertiary px-2 py-0.5 rounded">
+            {match.region || "—"}
+          </span>
         </div>
 
         {/* VS champion */}

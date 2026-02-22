@@ -24,8 +24,8 @@ export function ChampionCard({ id, name, iconUrl, roles = [] }: ChampionCardProp
   return (
     <Link href={`/champion/${id}`}>
       <motion.div
-        whileHover={{ y: -3 }}
-        className="bg-surface border border-border rounded-xl overflow-hidden cursor-pointer transition-shadow hover:shadow-md hover:border-accent/40 group"
+        whileHover={{ y: -2 }}
+        className="relative bg-transparent border border-border rounded-md overflow-hidden cursor-pointer transition-all hover:border-gold/60 hover:bg-surface-secondary group"
       >
         <div className="relative aspect-square">
           <Image
@@ -35,14 +35,15 @@ export function ChampionCard({ id, name, iconUrl, roles = [] }: ChampionCardProp
             sizes="(max-width: 768px) 20vw, 100px"
             className="object-cover"
           />
-        </div>
-        <div className="px-1.5 py-2 text-center">
-          <p className="text-xs font-semibold text-fg truncate">{name}</p>
-          {roles.length > 0 && (
-            <p className="text-[10px] text-fg-muted leading-tight mt-0.5 truncate">
-              {roles.map((r) => ROLE_SHORT[r] || r).join(" · ")}
-            </p>
-          )}
+          {/* Gradient overlay with name */}
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent pt-4 pb-1.5 px-1.5">
+            <p className="text-xs font-semibold text-white truncate leading-tight">{name}</p>
+            {roles.length > 0 && (
+              <p className="text-[9px] text-white/60 leading-tight truncate mt-0.5">
+                {roles.map((r) => ROLE_SHORT[r] || r).join(" · ")}
+              </p>
+            )}
+          </div>
         </div>
       </motion.div>
     </Link>

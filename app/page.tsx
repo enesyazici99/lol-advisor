@@ -1,6 +1,4 @@
 import { getLatestVersion, getChampions } from "@/lib/riot/ddragon";
-import { Header } from "@/components/layout/Header";
-import { SearchBar } from "@/components/layout/SearchBar";
 import { Footer } from "@/components/layout/Footer";
 import { RoleFilter } from "@/components/champions/RoleFilter";
 import { ChampionGrid } from "@/components/champions/ChampionGrid";
@@ -18,10 +16,8 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 pt-6">
       <HomeClient version={version} />
-      <Header />
-      <SearchBar />
       <RoleFilter />
 
       {Object.keys(champions).length > 0 ? (

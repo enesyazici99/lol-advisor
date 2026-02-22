@@ -1,5 +1,4 @@
 import { getLatestVersion } from "@/lib/riot/ddragon";
-import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { HomeClient } from "@/app/HomeClient";
 import { SummonerPageClient } from "./SummonerPageClient";
@@ -41,9 +40,8 @@ export default async function SummonerPage({ params }: SummonerPageProps) {
   }
 
   return (
-    <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 pt-6">
       <HomeClient version={version} />
-      <Header />
       <SummonerPageClient
         gameName={gameName}
         tagLine={tagLine}

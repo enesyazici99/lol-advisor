@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { getLatestVersion, getChampions } from "@/lib/riot/ddragon";
-import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { HomeClient } from "@/app/HomeClient";
 import { AdvisorPageClient } from "./AdvisorPageClient";
@@ -23,9 +22,8 @@ export default async function AdvisorPage() {
   }
 
   return (
-    <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 pt-6">
       <HomeClient version={version} />
-      <Header />
       <Suspense fallback={<LoadingSpinner />}>
         <AdvisorPageClient champions={champions} version={version} />
       </Suspense>

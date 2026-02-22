@@ -37,6 +37,7 @@ const config: Config = {
           secondary: "var(--fg-secondary)",
           muted: "var(--fg-muted)",
         },
+        gold: "var(--gold)",
       },
       fontFamily: {
         sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
