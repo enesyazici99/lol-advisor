@@ -83,6 +83,14 @@ export const ROLE_LABELS: Record<Role, string> = {
   SUP: "Support",
 };
 
+export const ROLE_TAG_MAP: Record<string, string[]> = {
+  TOP: ["Fighter", "Tank"],
+  JGL: ["Fighter", "Assassin"],
+  MID: ["Mage", "Assassin"],
+  ADC: ["Marksman"],
+  SUP: ["Support", "Tank"],
+};
+
 export const REGIONS = ["KR", "EUW", "NA", "CN", "LCK", "LEC", "LCS", "LPL"] as const;
 export type Region = (typeof REGIONS)[number];
 

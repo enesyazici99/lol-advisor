@@ -59,11 +59,9 @@ export interface MatchupData {
   vs_champion_key: string;
   role: string;
   win_rate: number;
-  games: number;
-  delta: number;
+  match_count: number;
   recommended_items: number[];
   recommended_runes: { keystone: number; secondary: number } | null;
-  recommended_spells: { spell1: number; spell2: number } | null;
   updated_at: string;
 }
 

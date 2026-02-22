@@ -61,6 +61,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(profile);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
+    if (message.includes("403")) {
+      return NextResponse.json(
+        { error: "Riot API key expired or invalid. Dev keys expire every 24 hours — generate a new one at developer.riotgames.com" },
+        { status: 403 }
+      );
+    }
     const status = message.includes("404") ? 404 : 500;
     return NextResponse.json({ error: message }, { status });
   }

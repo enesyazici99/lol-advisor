@@ -4,20 +4,13 @@ import { motion } from "framer-motion";
 import { useAppStore } from "@/stores/appStore";
 import { ChampionCard } from "./ChampionCard";
 import { championIconUrl } from "@/lib/riot/ddragon";
+import { ROLE_TAG_MAP } from "@/lib/riot/constants";
 import type { DDragonChampion } from "@/lib/riot/ddragon";
 
 interface ChampionGridProps {
   champions: Record<string, DDragonChampion>;
   version: string;
 }
-
-const ROLE_TAG_MAP: Record<string, string[]> = {
-  TOP: ["Fighter", "Tank"],
-  JGL: ["Fighter", "Assassin"],
-  MID: ["Mage", "Assassin"],
-  ADC: ["Marksman"],
-  SUP: ["Support", "Tank"],
-};
 
 export function ChampionGrid({ champions, version }: ChampionGridProps) {
   const searchQuery = useAppStore((s) => s.searchQuery);

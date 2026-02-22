@@ -33,10 +33,10 @@ export async function getMatchupBuild(
       items: matchup.recommended_items,
       runeKeystoneId: matchup.recommended_runes?.keystone ?? null,
       runeSecondaryTreeId: matchup.recommended_runes?.secondary ?? null,
-      spell1: matchup.recommended_spells?.spell1 ?? null,
-      spell2: matchup.recommended_spells?.spell2 ?? null,
+      spell1: null,
+      spell2: null,
       winRate: matchup.win_rate,
-      games: matchup.games,
+      games: matchup.match_count,
       isMatchupSpecific: true,
     };
   }

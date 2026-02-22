@@ -5,7 +5,6 @@ export interface ScoredMatchup {
   championKey: string;
   winRate: number;
   games: number;
-  delta: number;
   tier: string;
   tierScore: number;
 }
@@ -35,8 +34,7 @@ export function scoreMatchup(matchup: MatchupData, generalWinRate = 50, pickRate
   return {
     championKey: matchup.champion_key,
     winRate: matchup.win_rate,
-    games: matchup.games,
-    delta: matchup.delta,
+    games: matchup.match_count,
     tier: calculateTier(tierScore),
     tierScore,
   };
@@ -56,7 +54,7 @@ export async function getCounterPicks(
     .select("*")
     .eq("vs_champion_key", vsChampion)
     .eq("role", role)
-    .gte("games", 50)
+    .gte("match_count", 50)
     .order("win_rate", { ascending: false })
     .limit(limit);
 
@@ -100,7 +98,7 @@ export async function getWeakPicks(
     .select("*")
     .eq("vs_champion_key", vsChampion)
     .eq("role", role)
-    .gte("games", 50)
+    .gte("match_count", 50)
     .order("win_rate", { ascending: true })
     .limit(limit);
 
